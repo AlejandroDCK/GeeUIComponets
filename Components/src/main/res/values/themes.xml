@@ -1,0 +1,29 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="TextTipStyle">
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_width">145px</item>
+        <item name="android:layout_height">39px</item>
+        <item name="android:layout_marginTop">61.5px</item>
+        <item name="android:maxWidth">324dp</item>
+        <item name="android:paddingHorizontal">20dp</item>
+        <item name="android:textColor">#ff000000</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textFontWeight">600</item>
+        <item name="android:fontFamily">MiSans</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:background">@drawable/message_form_background</item>
+        <item name="android:singleLine">true</item>
+
+    </style>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <!--        <item name="android:background">@color/black</item>-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+</resources>

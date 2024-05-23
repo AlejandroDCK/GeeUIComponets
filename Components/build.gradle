@@ -1,0 +1,50 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    namespace 'com.letianpai.robot.components'
+    compileSdk 32
+
+    defaultConfig {
+        minSdk 26
+        targetSdk 32
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.google.android.material:material:1.5.0'
+
+    //集成xlog
+    api 'com.elvishew:xlog:1.10.1'
+
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    api "com.google.code.gson:gson:2.8.6"
+    api 'com.squareup.okhttp3:okhttp:4.10.0'
+    api 'com.squareup.okio:okio:1.13.0'
+//    api 'com.github.bumptech.glide:glide:3.7.0'
+    api 'com.squareup.picasso:picasso:2.5.2'
+    implementation('com.google.zxing:core:3.4.1') {
+        exclude group: 'com.google.zxing'
+    }
+
+
+}
