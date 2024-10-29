@@ -38,7 +38,7 @@ class WIFIConnectionManager(private val mContext: Context) {
         Log.e("auto_connect", "connect() called with: ssid = [$ssid], password = [$password]")
         Log.e("auto_connect", "connect: wifi opened = " + openWifi())
 
-        val isConnected = isConnected(ssid) //当前已连接至指定wifi
+        val isConnected = isConnected(ssid) //Currently connected to the specified wifi
         Log.e(TAG, "connect: is already connected = $isConnected")
         if (isConnected) {
             return true
@@ -78,10 +78,10 @@ class WIFIConnectionManager(private val mContext: Context) {
         config.allowedKeyManagement.clear()
         config.allowedPairwiseCiphers.clear()
         config.allowedProtocols.clear()
-        if (isClient) { //作为客户端, 连接服务端wifi热点时要加双引号
+        if (isClient) { //As a client, connect to the server's wifi hotspot in double quotes.
             config.SSID = "\"" + ssid + "\""
             config.preSharedKey = "\"" + password + "\""
-        } else { //作为服务端, 开放wifi热点时不需要加双引号
+        } else { //As a server, open wifi hotspot without double quotes
             config.SSID = ssid
             config.preSharedKey = password
         }
@@ -96,19 +96,14 @@ class WIFIConnectionManager(private val mContext: Context) {
         return config
     }
 
-    val isWifiEnabled: Boolean
-        /**
-         * @return 热点是否已开启
-         */
-        get() {
-            try {
-                val methodIsWifiApEnabled =
-                    WifiManager::class.java.getDeclaredMethod("isWifiApEnabled")
-                return methodIsWifiApEnabled.invoke(wifiManager) as Boolean
-            } catch (e: Exception) {
-                Log.e(TAG, "isWifiEnabled: " + e.message)
-                return false
-            }
+    val isWifiEnabled: Boolean =
+        try {
+            val methodIsWifiApEnabled =
+                WifiManager::class.java.getDeclaredMethod("isWifiApEnabled")
+            methodIsWifiApEnabled.invoke(wifiManager) as Boolean
+        } catch (e: Exception) {
+            Log.e(TAG, "isWifiEnabled: " + e.message)
+            false
         }
 
     /**
@@ -128,16 +123,14 @@ class WIFIConnectionManager(private val mContext: Context) {
             else -> return false
         }
     }
-
-    val isConnected: Boolean
-        /**
-         * Whether the specified wifi is connected
-         */
-        get() = if (TextUtils.isEmpty(currentSsid)) {
-            false
-        } else {
-            isConnected(currentSsid) && isNetworkAvailable(mContext)
-        }
+    /**
+     * Whether the specified wifi is connected
+     */
+    val isConnected: Boolean = if (TextUtils.isEmpty(currentSsid)) {
+        false
+    } else {
+        isConnected(currentSsid) && isNetworkAvailable(mContext)
+    }
 
     /**
      * Turn on the WiFi.
@@ -224,11 +217,11 @@ class WIFIConnectionManager(private val mContext: Context) {
         return null
     }
 
-    val localIp: String?
-        /**
-         * Get local ip address
-         */
-        get() = convertIp(wifiManager.connectionInfo.ipAddress)
+    /**
+     * Get local ip address
+     */
+    val localIp: String = convertIp(wifiManager.connectionInfo.ipAddress).toString()
+
 
     private fun convertIp(ipAddress: Int): String? {
         if (ipAddress == 0) return null
@@ -354,6 +347,7 @@ class WIFIConnectionManager(private val mContext: Context) {
             return false
         }
 
+        /*
         val isWifiConnected: Boolean
             get() {
                 if (sInstance!!.mContext != null) {
@@ -367,5 +361,7 @@ class WIFIConnectionManager(private val mContext: Context) {
                 }
                 return false
             }
+         */
+
     }
 }

@@ -33,7 +33,6 @@ class AppTitleTipCallback private constructor() {
     }
 
     companion object {
-        val instance: AppTitleTipCallback
-            get() = AppTitleTipCallbackHolder.instance
+        val instance: AppTitleTipCallback = AppTitleTipCallbackHolder.instance
     }
 }

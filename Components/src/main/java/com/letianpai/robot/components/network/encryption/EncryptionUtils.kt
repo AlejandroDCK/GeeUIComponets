@@ -82,9 +82,7 @@ class EncryptionUtils private constructor(private val mContext: Context) {
             return robotSign
         }
 
-        val robotMac: String
-            get() = SystemUtil.wlanMacAddress!!.lowercase(Locale.getDefault())
-        val ts: String
-            get() = (System.currentTimeMillis() / 1000).toString() + ""
+        val robotMac: String = SystemUtil.wlanMacAddress!!.lowercase(Locale.getDefault())
+        val ts: String = (System.currentTimeMillis() / 1000).toString() + ""
     }
 }

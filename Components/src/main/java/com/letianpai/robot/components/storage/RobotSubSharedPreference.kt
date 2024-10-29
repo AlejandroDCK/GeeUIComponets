@@ -74,8 +74,7 @@ class RobotSubSharedPreference(context: Context?, fileName: String?, action: Str
         mMap = mSharedPref!!.all as MutableMap<String, Any?>
     }
 
-    val map: Map<String, Any?>?
-        get() = this.mMap
+    val map: Map<String, Any?>? = this.mMap
 
     /**
      * 内存操作，释放对象占用的资源，取消广播，清空内存数据

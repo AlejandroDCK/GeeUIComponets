@@ -29,7 +29,6 @@ class SessionTokenUpdateCallback private constructor() {
 
 
     companion object {
-        val instance: SessionTokenUpdateCallback
-            get() = RobotCommandWordsCallbackHolder.instance
+        val instance: SessionTokenUpdateCallback = RobotCommandWordsCallbackHolder.instance
     }
 }

@@ -33,8 +33,7 @@ class ExpressionPathCallback private constructor() {
 
 
     companion object {
-        val instance: ExpressionPathCallback
-            get() = ExpressionPathCallbackHolder.instance
+        val instance: ExpressionPathCallback = ExpressionPathCallbackHolder.instance
     }
 }
 

@@ -33,7 +33,6 @@ class AppQRCodeInfoCallback private constructor() {
     }
 
     companion object {
-        val instance: AppQRCodeInfoCallback
-            get() = AppQRCodeInfoCallbackHolder.instance
+        val instance: AppQRCodeInfoCallback = AppQRCodeInfoCallbackHolder.instance
     }
 }
