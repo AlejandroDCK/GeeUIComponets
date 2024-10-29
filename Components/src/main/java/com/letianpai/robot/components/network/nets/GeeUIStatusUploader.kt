@@ -7,10 +7,12 @@ import android.content.IntentFilter
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.SystemClock
+import android.util.Log
 import com.google.gson.Gson
 import com.letianpai.robot.components.charging.BatteryReceiver
 import com.letianpai.robot.components.charging.ChargingUpdateCallback
 import com.letianpai.robot.components.charging.ChargingUpdateCallback.ChargingUpdateListener
+import com.letianpai.robot.components.network.callback.AppUploadConfigCallback
 import com.letianpai.robot.components.network.system.SystemUtil
 import com.letianpai.robot.components.parser.base.BaseMessageInfo
 import com.letianpai.robot.components.storage.RobotSubConfigManager
@@ -56,10 +58,10 @@ class GeeUIStatusUploader private constructor(context: Context) {
             }
         })
 
-        //TODO 屏蔽消息提醒
+        //TODO Block Message Alerts
     }
 
-    //电池监听
+    //battery monitoring
     private fun setBatteryListener() {
         val batteryReceiver = BatteryReceiver()
         val intentFilter = IntentFilter()
@@ -71,7 +73,7 @@ class GeeUIStatusUploader private constructor(context: Context) {
 
 
     /**
-     * 更新机器人状态
+     * Update robot status
      *
      * @param callback
      */
@@ -79,16 +81,16 @@ class GeeUIStatusUploader private constructor(context: Context) {
         if (currentPercent == 0) {
             return
         }
-        val sn = SystemUtil.getLtpSn()
-        val mac = SystemUtil.getWlanMacAddress()
-        val ip = SystemUtil.getIp(mContext)
-        val mcu = SystemUtil.getMcu()
+        val sn = SystemUtil.ltpSn
+        val mac = SystemUtil.wlanMacAddress
+        val ip = SystemUtil.getIp(mContext!!)
+        val mcu = SystemUtil.mcu
         val wifiSsid = getConnectWifiSsid(mContext)
         val btAddress = btAddressByReflection
         val battery = ChargingUpdateCallback.instance.battery
-        val volume: Int = VolumeManager.Companion.getInstance(mContext).getCurrentVolume()
+        val volume: Int = VolumeManager.getInstance(mContext)!!.currentVolume
         val isInHighTemperature = isInHighTemperature
-        val space = SDCardUtil.getAvailableSpaceInBytes()
+        val space = SDCardUtil.availableSpaceInBytes
         val temp = cpuThermal
         val uptime = (SystemClock.elapsedRealtime()) / 1000
 
@@ -106,16 +108,16 @@ class GeeUIStatusUploader private constructor(context: Context) {
 //        Log.e("letianpai_uploader","temp: "+ temp);
 //        Log.e("letianpai_uploader","uptime: "+ uptime);
 
-        //TODO 增加获取
-        val hashMap: HashMap<String?, Any?> = HashMap<Any?, Any?>()
+        //TODO Increased access
+        val hashMap: HashMap<String, Any> = HashMap()
         if (battery > 0) {
             hashMap["battery_percent"] = battery
         }
-        hashMap["ble"] = btAddress
+        hashMap["ble"] = btAddress?: ""
         //        hashMap.put("humidity", 0);
-        hashMap["mac"] = mac
-        hashMap["mcu_version"] = mcu
-        hashMap["ip"] = ip
+        hashMap["mac"] = mac?: ""
+        hashMap["mcu_version"] = mcu?: ""
+        hashMap["ip"] = ip?: ""
         hashMap["rom_version"] = Build.DISPLAY
         hashMap["sn"] = sn
         hashMap["sound_volume"] = volume
@@ -136,15 +138,15 @@ class GeeUIStatusUploader private constructor(context: Context) {
         }
         hashMap["space"] = space
         hashMap["uptime"] = uptime
-        GeeUiNetManager.uploadStatus(mContext, SystemUtil.isInChinese(), hashMap, callback)
+        GeeUiNetManager.uploadStatus(mContext, SystemUtil.isInChinese, hashMap, callback)
     }
 
 
     private fun checkUploadFrequency() {
         val uploadFrequencyInternalTime: Long =
-            RobotSubConfigManager.Companion.getInstance(mContext).getUploadFrequencyInternalTime()
+            RobotSubConfigManager.Companion.getInstance(mContext)!!.uploadFrequencyInternalTime
         val currentTime = System.currentTimeMillis()
-        val isChinese = SystemUtil.isInChinese()
+        val isChinese = SystemUtil.isInChinese
         //        GeeUILogUtils.logi("uploadFrequency", "uploadFrequencyInternalTime: " + uploadFrequencyInternalTime);
 //        GeeUILogUtils.logi("uploadFrequency", "currentTime: " + currentTime);
         if ((currentTime - uploadFrequencyInternalTime) > UPDATE_INTERNAL_TIME) {
@@ -169,17 +171,23 @@ class GeeUIStatusUploader private constructor(context: Context) {
     }
 
     private fun checkRobotUploadFrequency() {
-        GeeUiNetManager.getUploadDataConfig(mContext, SystemUtil.isInChinese()) { uploadFrequency ->
-            if (uploadFrequency > 0) {
-                RobotSubConfigManager.Companion.getInstance(mContext)!!
-                    .setUploadFrequency(uploadFrequency)
-                RobotSubConfigManager.Companion.getInstance(mContext)
-                    .setUploadFrequencyInternalTime(
-                        System.currentTimeMillis()
-                    )
-                RobotSubConfigManager.Companion.getInstance(mContext)!!.commit()
+        val listener = object : AppUploadConfigCallback.AppUploadConfigUpdateListener {
+            override fun onAppUploadConfigUpdate(uploadFrequency: Int) {
+                if (uploadFrequency > 0) {
+                    val configManager = RobotSubConfigManager.getInstance(mContext)
+                    if (configManager != null) {
+                        configManager.setUploadFrequency(uploadFrequency)
+                        configManager.uploadFrequencyInternalTime = System.currentTimeMillis()
+                        configManager.commit()
+                    } else {
+                        Log.e("RobotUploadFrequency", "RobotSubConfigManager instance is null")
+                        // Handle the error, e.g., show a message or retry
+                    }
+                }
             }
         }
+
+        GeeUiNetManager.getUploadDataConfig(mContext!!, SystemUtil.isInChinese, listener)
     }
 
     fun uploadRobotStatus() {
@@ -198,11 +206,11 @@ class GeeUIStatusUploader private constructor(context: Context) {
 
     private fun uploadRobotData() {
         val internalTime: Long =
-            RobotSubConfigManager.Companion.getInstance(mContext).getUploadFrequencyInternalTime()
+            RobotSubConfigManager.getInstance(mContext)!!.uploadFrequencyInternalTime
         val uploadFrequency: Long =
-            RobotSubConfigManager.Companion.getInstance(mContext).getUploadFrequency()
+            RobotSubConfigManager.getInstance(mContext)!!.uploadFrequency
         val uploadDataTime: Long =
-            RobotSubConfigManager.Companion.getInstance(mContext).getUploadDataTime()
+            RobotSubConfigManager.getInstance(mContext)!!.uploadDataTime
 
         val current = System.currentTimeMillis()
         //        GeeUILogUtils.logi("uploadFrequency", "internalTime: " + internalTime);
@@ -218,17 +226,17 @@ class GeeUIStatusUploader private constructor(context: Context) {
     }
 
     fun uploadRobotStatusData() {
-        getInstance(mContext)!!.uploadStatus(object : Callback {
+        getInstance(mContext!!)!!.uploadStatus(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
             }
 
             @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {
-                if (response?.body() != null) {
+                if (response?.body != null) {
                     var info = ""
-                    if (response?.body() != null) {
-                        info = response.body()!!.string()
+                    if (response?.body != null) {
+                        info = response.body!!.string()
                     }
                     val baseMessageInfo: BaseMessageInfo?
                     if (info != null) {
@@ -237,11 +245,10 @@ class GeeUIStatusUploader private constructor(context: Context) {
                             baseMessageInfo = Gson().fromJson(info, BaseMessageInfo::class.java)
                             if (baseMessageInfo != null && baseMessageInfo.msg != null) {
                                 if (baseMessageInfo.code == 0) {
-                                    RobotSubConfigManager.Companion.getInstance(mContext)
-                                        .setUploadDataTime(
+                                    RobotSubConfigManager.getInstance(mContext)!!.uploadDataTime = (
                                             System.currentTimeMillis()
                                         )
-                                    RobotSubConfigManager.Companion.getInstance(mContext)!!.commit()
+                                    RobotSubConfigManager.getInstance(mContext)!!.commit()
                                 }
                             }
                         } catch (e: Exception) {

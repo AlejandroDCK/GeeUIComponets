@@ -16,10 +16,10 @@ class AppListManager {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.QUERY_ALL_PACKAGES)
             == PackageManager.PERMISSION_GRANTED
         ) {
-            // 已经获得权限，可以获取应用列表
+            // Permission has been granted to access the app list
             getInstalledAppsList(context)
         } else {
-            // 未获得权限，请求用户授权
+            //Permission not granted, user authorisation requested
             ActivityCompat.requestPermissions(
                 context,
                 arrayOf(Manifest.permission.QUERY_ALL_PACKAGES),
@@ -34,7 +34,7 @@ class AppListManager {
             val installedApps = packageManager.getInstalledApplications(0)
 
             for (appInfo in installedApps) {
-                // 过滤掉系统应用
+                // Filter out system applications
                 if ((appInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0) {
                     val appName = appInfo.loadLabel(packageManager).toString()
                     val packageName = appInfo.packageName

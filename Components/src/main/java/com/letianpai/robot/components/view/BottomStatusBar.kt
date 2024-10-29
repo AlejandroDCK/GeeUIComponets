@@ -25,10 +25,10 @@ import java.util.Random
 class BottomStatusBar : RelativeLayout {
     private var mContext: Context? = null
     private var bottomText: TextView? = null
-    private var tipsList: Array<TipsName?>? = null
+    private var tipsList: Array<TipsName>? = null
     private var mainCountDownTimer: CountDownTimer? = null
     private var random: Random? = null
-    var handler: Handler = Handler(Looper.getMainLooper())
+    var mainHandler: Handler = Handler(Looper.getMainLooper())
 
     constructor(context: Context) : super(context) {
         init(context)
@@ -57,7 +57,7 @@ class BottomStatusBar : RelativeLayout {
     //请求接口
     private fun requestTips() {
         Thread {
-            if (SystemUtil.isInChinese()) {
+            if (SystemUtil.isInChinese) {
                 getCommandWords(true)
             } else {
                 getCommandWords(false)
@@ -74,7 +74,7 @@ class BottomStatusBar : RelativeLayout {
                 mainCountDownTimer!!.start()
             }
         }
-        mainCountDownTimer.start()
+        mainCountDownTimer!!.start()
     }
 
     private fun updateTips() {
@@ -82,16 +82,16 @@ class BottomStatusBar : RelativeLayout {
             random = Random()
             val index = random!!.nextInt(tipsList!!.size)
             //            GeeUILogUtils.logi("<<<<", "updateTips:"+tipsList[index].getTips_name());
-            if (!TextUtils.isEmpty(tipsList!![index].getTips_name())) {
+            if (!TextUtils.isEmpty(tipsList!![index]!!.tips_name)) {
                 bottomText!!.text = ""
-                bottomText.setText(tipsList!![index].getTips_name())
+                bottomText!!.text = (tipsList!![index]!!.tips_name)
             }
         }
     }
 
     private fun initView() {
         bottomText = findViewById(R.id.bottom_part)
-        if (SystemUtil.isInChinese()) {
+        if (SystemUtil.isInChinese) {
             val tipsName1 = TipsName()
             tipsName1.tips_name = "试试说“嗨，小乐”，天气"
             val tipsName2 = TipsName()
@@ -115,11 +115,11 @@ class BottomStatusBar : RelativeLayout {
 
             @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {
-                if (response?.body() != null) {
+                if (response.body != null) {
                     var tips: Tips? = null
                     var info = ""
-                    if (response?.body() != null) {
-                        info = response.body()!!.string()
+                    if (response?.body != null) {
+                        info = response.body!!.string()
                     }
                     //                    Log.d("<<<<", "---info::"+info);
                     try {
@@ -127,11 +127,11 @@ class BottomStatusBar : RelativeLayout {
                             tips = Gson().fromJson(info, Tips::class.java)
                             if (tips != null) {
                                 tipsList = if (isChinese) {
-                                    tips.data.config_data.tips_list
+                                    tips.data!!.config_data!!.tips_list
                                 } else {
-                                    tips.data.config_data.tips_en_list
+                                    tips.data!!.config_data!!.tips_en_list
                                 }
-                                handler.post { updateTips() }
+                                mainHandler.post { updateTips() }
                             }
                         }
                     } catch (e: Exception) {

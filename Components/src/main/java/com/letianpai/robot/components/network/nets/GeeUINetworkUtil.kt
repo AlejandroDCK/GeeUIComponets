@@ -2,33 +2,20 @@ package com.letianpai.robot.components.network.nets
 
 import android.content.Context
 import android.os.Build
+//import androidx.privacysandbox.tools.core.generator.build
 import com.google.gson.Gson
 import com.letianpai.robot.components.network.encryption.EncryptionUtils
 import com.letianpai.robot.components.network.system.SystemUtil
 import okhttp3.Callback
-import okhttp3.HttpUrl
-import okhttp3.HttpUrl.Builder.addQueryParameter
-import okhttp3.HttpUrl.Builder.build
-import okhttp3.MediaType
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.MultipartBody.Builder.addFormDataPart
-import okhttp3.MultipartBody.Builder.build
-import okhttp3.MultipartBody.Builder.setType
 import okhttp3.OkHttpClient
-import okhttp3.OkHttpClient.Builder.build
-import okhttp3.OkHttpClient.Builder.callTimeout
-import okhttp3.OkHttpClient.Builder.connectTimeout
-import okhttp3.OkHttpClient.Builder.readTimeout
 import okhttp3.Request
-import okhttp3.Request.Builder.addHeader
-import okhttp3.Request.Builder.build
-import okhttp3.Request.Builder.get
-import okhttp3.Request.Builder.method
-import okhttp3.Request.Builder.post
-import okhttp3.Request.Builder.url
-import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.time.Duration
+import okhttp3.RequestBody.Companion.asRequestBody
 
 /**
  * @author liujunbin
@@ -64,62 +51,58 @@ class GeeUINetworkUtil private constructor(context: Context) {
             }
         }
 
+        private val okHttpClient: OkHttpClient by lazy { OkHttpClient() }
+
+
         fun get(uri: String, callback: Callback?) {
-            val okHttpClient = OkHttpClient()
-            val builder: Builder = Builder()
-            val request: Request = builder.get().url("https://yourservice.com$uri").build()
-            val call = okHttpClient.newCall(request)
-            call.enqueue(callback!!)
+            val request = Request.Builder()
+                .url("https://yourservice.com$uri")
+                .build()
+            okHttpClient.newCall(request).enqueue(callback!!)
         }
 
         fun get1(context: Context?, uri: String, callback: Callback?) {
-            val okHttpClient = OkHttpClient()
-            val builder: Builder = Builder()
-            val httpBuilder: Builder = HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
-            val sn = SystemUtil.getLtpSn()
-            httpBuilder.addQueryParameter("sn", sn)
-
-            val request: Request = Builder()
-                .url(httpBuilder.build())
+            val url = "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                .addQueryParameter("sn", SystemUtil.ltpSn)
                 .build()
 
-            val call = okHttpClient.newCall(request)
-            call.enqueue(callback!!)
+            val request = Request.Builder()
+                .url(url)
+                .build()
+
+            okHttpClient.newCall(request).enqueue(callback!!)
         }
 
         fun get11(context: Context?, uri: String, callback: Callback?) {
-            val okHttpClient = OkHttpClient()
-            val httpBuilder: Builder = HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
-            val mac: String = EncryptionUtils.Companion.getRobotMac()
-            val ts: String = EncryptionUtils.Companion.getTs()
-            val auth: String = EncryptionUtils.Companion.getHardCodeSign(ts)
-            httpBuilder.addQueryParameter("mac", mac)
-            httpBuilder.addQueryParameter("ts", ts)
-
-            val request: Request = Builder()
-                .url(httpBuilder.build())
-                .addHeader(AUTHORIZATION, auth)
+            val url = "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                .addQueryParameter("mac", EncryptionUtils.robotMac)
+                .addQueryParameter("ts", EncryptionUtils.ts)
                 .build()
 
-            val call = okHttpClient.newCall(request)
-            call.enqueue(callback!!)
+            val request = Request.Builder()
+                .url(url)
+                .addHeader(AUTHORIZATION, EncryptionUtils.getHardCodeSign(EncryptionUtils.ts))
+                .build()
+
+            okHttpClient.newCall(request).enqueue(callback!!)
         }
 
         fun get11(context: Context?, auth: String?, ts: String?, uri: String, callback: Callback?) {
-            val okHttpClient = OkHttpClient()
-            val httpBuilder: Builder = HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
-            val mac: String = EncryptionUtils.Companion.getRobotMac()
 
-            httpBuilder.addQueryParameter("mac", mac)
-            httpBuilder.addQueryParameter("ts", ts)
-
-            val request: Request = Builder()
-                .url(httpBuilder.build())
-                .addHeader(AUTHORIZATION, auth)
+            val url = "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                .addQueryParameter("mac", EncryptionUtils.robotMac)
+                .addQueryParameter("ts", EncryptionUtils.ts)
                 .build()
 
-            val call = okHttpClient.newCall(request)
-            call.enqueue(callback!!)
+            val request = auth?.let {
+                Request.Builder()
+                    .url(url)
+                    .addHeader(AUTHORIZATION, it)
+                    .build()
+            }
+
+            okHttpClient.newCall(request!!).enqueue(callback!!)
+
         }
 
         fun get11(
@@ -130,23 +113,39 @@ class GeeUINetworkUtil private constructor(context: Context) {
             uri: String,
             callback: Callback?
         ) {
-            val okHttpClient = OkHttpClient()
-            val httpBuilder: Builder = if (isChinese) {
-                HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
+            val url = if (isChinese) {
+                "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                    .addQueryParameter("mac", EncryptionUtils.robotMac)
+                    .addQueryParameter("ts", ts)
+                    .apply {
+                        if (uri == GeeUINetworkConsts.GET_APP_BG_INFO) {
+                            addQueryParameter("package_name", context!!.packageName)
+                        }
+                    }
+                    .build()
             } else {
-                HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
+                "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                    .addQueryParameter("mac", EncryptionUtils.robotMac)
+                    .addQueryParameter("ts", ts)
+                    .apply {
+                        if (uri == GeeUINetworkConsts.GET_APP_BG_INFO) {
+                            addQueryParameter("package_name", context!!.packageName)
+                        }
+                    }
+                    .build()
             }
-            val mac: String = EncryptionUtils.Companion.getRobotMac()
-            httpBuilder.addQueryParameter("mac", mac)
-            httpBuilder.addQueryParameter("ts", ts)
 
-            val request: Request = Builder()
-                .url(httpBuilder.build())
-                .addHeader(AUTHORIZATION, auth)
-                .build()
+            val country = if (isChinese) CN else GLOBAL
 
-            val call = okHttpClient.newCall(request)
-            call.enqueue(callback!!)
+            val request = auth?.let {
+                Request.Builder()
+                    .url(url)
+                    .addHeader(AUTHORIZATION, it)
+                    .addHeader(COUNTRY, country)
+                    .build()
+            }
+
+            okHttpClient.newCall(request!!).enqueue(callback!!)
         }
 
         fun get(
@@ -158,33 +157,39 @@ class GeeUINetworkUtil private constructor(context: Context) {
             uri: String,
             callback: Callback?
         ) {
-            val okHttpClient = OkHttpClient()
-
-            val httpBuilder: Builder = if (isChinese) {
-                HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
+            val url = if (isChinese) {
+                "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                    .addQueryParameter("sn", sn)
+                    .addQueryParameter("ts", ts)
+                    .apply {
+                        if (uri == GeeUINetworkConsts.GET_APP_BG_INFO) {
+                            addQueryParameter("package_name", context.packageName)
+                        }
+                    }
+                    .build()
             } else {
-                HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
+                "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                    .addQueryParameter("sn", sn)
+                    .addQueryParameter("ts", ts)
+                    .apply {
+                        if (uri == GeeUINetworkConsts.GET_APP_BG_INFO) {
+                            addQueryParameter("package_name", context.packageName)
+                        }
+                    }
+                    .build()
             }
 
-            httpBuilder.addQueryParameter("sn", sn)
-            httpBuilder.addQueryParameter("ts", ts)
+            val country = if (isChinese) CN else GLOBAL
 
-            if (uri == GeeUINetworkConsts.GET_APP_BG_INFO) {
-                httpBuilder.addQueryParameter("package_name", context.packageName)
+            val request = auth?.let {
+                Request.Builder()
+                    .url(url)
+                    .addHeader(AUTHORIZATION, it)
+                    .addHeader(COUNTRY, country)
+                    .build()
             }
 
-            var country = CN
-            if (!isChinese) {
-                country = GLOBAL
-            }
-            val request: Request = Builder()
-                .url(httpBuilder.build())
-                .addHeader(AUTHORIZATION, auth)
-                .addHeader(COUNTRY, country)
-                .build()
-
-            val call = okHttpClient.newCall(request)
-            call.enqueue(callback!!)
+            okHttpClient.newCall(request!!).enqueue(callback!!)
         }
 
         fun getWithPage(
@@ -197,30 +202,33 @@ class GeeUINetworkUtil private constructor(context: Context) {
             pageSize: Int,
             callback: Callback?
         ) {
-            val okHttpClient = OkHttpClient()
 
-            val httpBuilder: Builder = if (isChinese) {
-                HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
+            val url = if (isChinese) {
+                "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                    .addQueryParameter("sn", sn)
+                    .addQueryParameter("ts", ts)
+                    .addQueryParameter("page_size", pageSize.toString() + "")
+                    .build()
             } else {
-                HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
+                "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                    .addQueryParameter("sn", sn)
+                    .addQueryParameter("ts", ts)
+                    .addQueryParameter("page_size", pageSize.toString() + "")
+                    .build()
             }
 
-            httpBuilder.addQueryParameter("sn", sn)
-            httpBuilder.addQueryParameter("ts", ts)
-            httpBuilder.addQueryParameter("page_size", pageSize.toString() + "")
+            val country = if (isChinese) CN else GLOBAL
 
-            var country = CN
-            if (!isChinese) {
-                country = GLOBAL
+            val request = auth?.let {
+                Request.Builder()
+                    .url(url)
+                    .addHeader(AUTHORIZATION, it)
+                    .addHeader(COUNTRY, country)
+                    .build()
             }
-            val request: Request = Builder()
-                .url(httpBuilder.build())
-                .addHeader(AUTHORIZATION, auth)
-                .addHeader(COUNTRY, country)
-                .build()
 
-            val call = okHttpClient.newCall(request)
-            call.enqueue(callback!!)
+            okHttpClient.newCall(request!!).enqueue(callback!!)
+
         }
 
         fun get(
@@ -233,29 +241,30 @@ class GeeUINetworkUtil private constructor(context: Context) {
             uri: String,
             callback: Callback?
         ) {
-            val okHttpClient = OkHttpClient()
 
-            val httpBuilder: Builder = if (isChinese) {
-                HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
+            val url = if (isChinese) {
+                "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                    .addQueryParameter("sn", sn)
+                    .addQueryParameter("ts", ts)
+                    .build()
             } else {
-                HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
+                "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                    .addQueryParameter("sn", sn)
+                    .addQueryParameter("ts", ts)
+                    .build()
             }
 
-            httpBuilder.addQueryParameter("sn", sn)
-            httpBuilder.addQueryParameter("ts", ts)
+            val country = if (isChinese) CN else GLOBAL
 
-            var country = CN
-            if (!isChinese) {
-                country = GLOBAL
+            val request = auth?.let {
+                Request.Builder()
+                    .url(url)
+                    .addHeader(AUTHORIZATION, it)
+                    .addHeader(COUNTRY, country)
+                    .build()
             }
-            val request: Request = Builder()
-                .url(httpBuilder.build())
-                .addHeader(AUTHORIZATION, auth)
-                .addHeader(COUNTRY, country)
-                .build()
 
-            val call = okHttpClient.newCall(request)
-            call.enqueue(callback!!)
+            okHttpClient.newCall(request!!).enqueue(callback!!)
         }
 
         fun get11(
@@ -266,19 +275,21 @@ class GeeUINetworkUtil private constructor(context: Context) {
             uri: String,
             callback: Callback?
         ) {
-            val okHttpClient = OkHttpClient()
-            val httpBuilder: Builder = HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
 
-            httpBuilder.addQueryParameter("sn", sn)
-            httpBuilder.addQueryParameter("ts", ts)
+            val url = "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                    .addQueryParameter("sn", sn)
+                    .addQueryParameter("ts", ts)
+                    .build()
+            
+            val request = auth?.let {
+                Request.Builder()
+                    .url(url)
+                    .addHeader(AUTHORIZATION, it)
+                    .build()
+            }
 
-            val request: Request = Builder()
-                .url(httpBuilder.build())
-                .addHeader(AUTHORIZATION, auth)
-                .build()
-
-            val call = okHttpClient.newCall(request)
-            call.enqueue(callback!!)
+            okHttpClient.newCall(request!!).enqueue(callback!!)
+            
         }
 
         fun get11(
@@ -289,25 +300,34 @@ class GeeUINetworkUtil private constructor(context: Context) {
             uri: String,
             callback: Callback?
         ) {
-            val okHttpClient = OkHttpClient()
-            val httpBuilder: Builder = if (isChinese) {
-                HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
+            val url = if (isChinese) {
+                "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                    .apply {
+                        hashMap.forEach { (key, value) ->
+                            addQueryParameter(key!!, value)
+                        }
+                    }
+                    .build()
             } else {
-                HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
-            }
-            for ((key, value) in hashMap) {
-                httpBuilder.addQueryParameter(key, value)
+                "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                    .apply {
+                        hashMap.forEach { (key, value) ->
+                            addQueryParameter(key!!, value)
+                        }
+                    }
+                    .build()
             }
 
-            val request: Request = Builder()
-                .url(httpBuilder.build())
-                .addHeader(AUTHORIZATION, auth)
-                .build()
+            val request = auth?.let {
+                Request.Builder()
+                    .url(url)
+                    .addHeader(AUTHORIZATION, it)
+                    .build()
+            }
 
-            val call = okHttpClient.newCall(request)
-            call.enqueue(callback!!)
+            okHttpClient.newCall(request!!).enqueue(callback!!)
         }
-
+        
         fun get11(
             context: Context?,
             auth: String?,
@@ -315,19 +335,22 @@ class GeeUINetworkUtil private constructor(context: Context) {
             uri: String,
             callback: Callback?
         ) {
-            val okHttpClient = OkHttpClient()
-            val httpBuilder: Builder = HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
-            for ((key, value) in hashMap) {
-                httpBuilder.addQueryParameter(key, value)
+            val url = "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                    .apply {
+                        hashMap.forEach { (key, value) ->
+                            addQueryParameter(key!!, value)
+                        }
+                    }
+                    .build()
+          
+            val request = auth?.let {
+                Request.Builder()
+                    .url(url)
+                    .addHeader(AUTHORIZATION, it)
+                    .build()
             }
 
-            val request: Request = Builder()
-                .url(httpBuilder.build())
-                .addHeader(AUTHORIZATION, auth)
-                .build()
-
-            val call = okHttpClient.newCall(request)
-            call.enqueue(callback!!)
+            okHttpClient.newCall(request!!).enqueue(callback!!)
         }
 
         fun get11ForMac(
@@ -337,20 +360,23 @@ class GeeUINetworkUtil private constructor(context: Context) {
             uri: String,
             callback: Callback?
         ) {
-            val okHttpClient = OkHttpClient()
-            val httpBuilder: Builder = HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
-            val mac: String = EncryptionUtils.Companion.getRobotMac()
 
-            httpBuilder.addQueryParameter("mac", mac)
-            httpBuilder.addQueryParameter("ts", ts)
+            val mac: String = EncryptionUtils.robotMac
 
-            val request: Request = Builder()
-                .url(httpBuilder.build())
-                .addHeader(AUTHORIZATION, auth)
+            val url = "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                .addQueryParameter("mac", mac)
+                .addQueryParameter("ts", ts)
                 .build()
 
-            val call = okHttpClient.newCall(request)
-            call.enqueue(callback!!)
+            val request = auth?.let {
+                Request.Builder()
+                    .url(url)
+                    .addHeader(AUTHORIZATION, it)
+                    .build()
+            }
+
+            okHttpClient.newCall(request!!).enqueue(callback!!)
+            
         }
 
         fun get(
@@ -359,126 +385,133 @@ class GeeUINetworkUtil private constructor(context: Context) {
             hashMap: HashMap<String, String>,
             callback: Callback?
         ) {
-            val okHttpClient = OkHttpClient()
-            val builder: Builder = Builder()
-            val httpBuilder: Builder = HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
-
-
-            val iterator: Iterator<Map.Entry<String, String>> = hashMap.entries.iterator()
-            while (iterator.hasNext()) {
-                val entry = iterator.next()
-                val key = entry.key
-                val value = entry.value
-                println("Key: $key, Value: $value")
-                httpBuilder.addQueryParameter(key, value)
-            }
-
-            val request: Request = Builder()
-                .url(httpBuilder.build())
+            val url = "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                .apply {
+                    hashMap.forEach { (key, value) ->
+                        addQueryParameter(key, value)
+                    }
+                }
                 .build()
 
-            val call = okHttpClient.newCall(request)
-            call.enqueue(callback!!)
+            val request = Request.Builder()
+                .url(url)
+                .build()
+
+            okHttpClient.newCall(request).enqueue(callback!!)
         }
 
         fun get(context: Context?, uri: String, callback: Callback?) {
-            val sn = SystemUtil.getLtpSn()
+            val sn = SystemUtil.ltpSn
             val authorization = ""
             get1(context, sn, authorization, uri, callback)
         }
 
         fun get1(context: Context?, sn: String?, key: String?, uri: String, callback: Callback?) {
-            val okHttpClient = OkHttpClient()
-            val builder: Builder = Builder()
-            val httpBuilder: Builder = HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
-
-            httpBuilder.addQueryParameter("sn", sn)
-
-            val request: Request = Builder()
-                .url(httpBuilder.build())
+            val url = "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                .addQueryParameter("sn", sn)
                 .build()
 
-            val call = okHttpClient.newCall(request)
-            call.enqueue(callback!!)
+            val request = Request.Builder()
+                .url(url)
+                .build()
+
+            okHttpClient.newCall(request).enqueue(callback!!)
         }
 
         fun get2(context: Context?, sn: String?, key: String?, uri: String, callback: Callback?) {
-            val okHttpClient = OkHttpClient()
-            val httpBuilder: Builder = HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
-
-            httpBuilder.addQueryParameter("sn", sn)
-
-            val request: Request = Builder()
-                .url(httpBuilder.build())
-                .addHeader(AUTHORIZATION, key)
+            val url = "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                .addQueryParameter("sn", sn)
                 .build()
 
-            val call = okHttpClient.newCall(request)
-            call.enqueue(callback!!)
+            val request = key?.let {
+                Request.Builder()
+                    .url(url)
+                    .addHeader(AUTHORIZATION, it)
+                    .build()
+            }
+
+            okHttpClient.newCall(request!!).enqueue(callback!!)
         }
 
         fun post(uri: String, hashMap: HashMap<*, *>, callback: Callback?) {
-            val list = ArrayList<Any>()
-            var client: OkHttpClient? = null
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                client = Builder().connectTimeout(Duration.ofMinutes(10L))
-                    .readTimeout(Duration.ofMinutes(10L)).callTimeout(
-                    Duration.ofMinutes(10L)
-                ).build()
+
+            val url = "https://yourservice.com$uri".toHttpUrlOrNull()!!
+
+            val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()!!
+            val requestBody = Gson().toJson(hashMap).toRequestBody(mediaType)
+            val request = Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .addHeader("Content-Type", "application/json")
+                .build()
+
+            val okHttpClient = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                OkHttpClient.Builder()
+                    .connectTimeout(Duration.ofMinutes(10))
+                    .readTimeout(Duration.ofMinutes(10))
+                    .callTimeout(Duration.ofMinutes(10))
+                    .build()
+            } else {
+                OkHttpClient()
             }
-            val url = "https://yourservice.com$uri"
-            val mediaType: MediaType = parse.parse("application/json; charset=utf-8")
-            list.add(hashMap)
-            val body: RequestBody = RequestBody.create(Gson().toJson(hashMap), mediaType)
-            val request: Request = Builder().url(url).method("POST", body)
-                .addHeader("Content-Type", "application/json").build()
-            client!!.newCall(request).enqueue(callback!!)
+
+            okHttpClient.newCall(request).enqueue(callback!!)
+
         }
 
         fun post1(uri: String, hashMap: HashMap<*, *>, callback: Callback?) {
-            val list = ArrayList<Any>()
-            var client: OkHttpClient? = null
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                client = Builder().connectTimeout(Duration.ofMinutes(10L))
-                    .readTimeout(Duration.ofMinutes(10L)).callTimeout(
-                    Duration.ofMinutes(10L)
-                ).build()
+            val url = "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+            .addQueryParameter("sn", SystemUtil.ltpSn)
+                .build()
+
+            val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()!!
+            val requestBody = Gson().toJson(hashMap).toRequestBody(mediaType)
+
+            val request = Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .addHeader("Content-Type", "application/json")
+                .build()
+
+            val okHttpClient = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                OkHttpClient.Builder()
+                    .connectTimeout(Duration.ofMinutes(10))
+                    .readTimeout(Duration.ofMinutes(10))
+                    .callTimeout(Duration.ofMinutes(10))
+                    .build()
+            } else {
+                OkHttpClient()
             }
-            val httpBuilder: Builder = HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
-            val sn = SystemUtil.getLtpSn()
-            httpBuilder.addQueryParameter("sn", sn)
 
-            val mediaType: MediaType = parse.parse("application/json; charset=utf-8")
-            list.add(hashMap)
-            val body: RequestBody = RequestBody.create(Gson().toJson(hashMap), mediaType)
-
-            val request: Request = Builder().url(httpBuilder.build()).method("POST", body)
-                .addHeader("Content-Type", "application/json").build()
-            client!!.newCall(request).enqueue(callback!!)
+            okHttpClient.newCall(request).enqueue(callback!!)
         }
 
         fun post2(uri: String, hashMap: HashMap<*, *>, callback: Callback?) {
-            val list = ArrayList<Any>()
-            var client: OkHttpClient? = null
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                client = Builder().connectTimeout(Duration.ofMinutes(10L))
-                    .readTimeout(Duration.ofMinutes(10L)).callTimeout(
-                    Duration.ofMinutes(10L)
-                ).build()
+            val url = "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                .addQueryParameter("sn", SystemUtil.ltpSn)
+                .addQueryParameter("ts", (System.currentTimeMillis() / 1000).toString() + "")
+                .build()
+
+            val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()!!
+            val requestBody = Gson().toJson(hashMap).toRequestBody(mediaType)
+
+            val request = Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .addHeader("Content-Type", "application/json")
+                .build()
+
+            val okHttpClient = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                OkHttpClient.Builder()
+                    .connectTimeout(Duration.ofMinutes(10))
+                    .readTimeout(Duration.ofMinutes(10))
+                    .callTimeout(Duration.ofMinutes(10))
+                    .build()
+            } else {
+                OkHttpClient()
             }
-            val httpBuilder: Builder = HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
-            val sn = SystemUtil.getLtpSn()
-            val ts = (System.currentTimeMillis() / 1000).toString() + ""
-            httpBuilder.addQueryParameter("sn", sn)
-            httpBuilder.addQueryParameter("ts", ts)
 
-            val mediaType: MediaType = parse.parse("application/json; charset=utf-8")
-            list.add(hashMap)
-            val body: RequestBody = RequestBody.create(Gson().toJson(hashMap), mediaType)
-
-            val request: Request = Builder().url(httpBuilder.build()).method("POST", body)
-                .addHeader("Content-Type", "application/json").build()
-            client!!.newCall(request).enqueue(callback!!)
+            okHttpClient.newCall(request).enqueue(callback!!)
         }
 
         fun post2(
@@ -488,26 +521,34 @@ class GeeUINetworkUtil private constructor(context: Context) {
             uri: String,
             callback: Callback?
         ) {
-            val list = ArrayList<Any>()
-            var client: OkHttpClient? = null
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                client = Builder().connectTimeout(Duration.ofMinutes(10L))
-                    .readTimeout(Duration.ofMinutes(10L)).callTimeout(
-                    Duration.ofMinutes(10L)
-                ).build()
+            val url = "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+            .addQueryParameter("sn", SystemUtil.ltpSn)
+                .addQueryParameter("ts", ts)
+                .build()
+
+            val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()!!
+            val requestBody = Gson().toJson(hashMap).toRequestBody(mediaType)
+
+            val request = auth?.let {
+                Request.Builder()
+                    .url(url)
+                    .post(requestBody)
+                    .addHeader(AUTHORIZATION, it)
+                    .addHeader("Content-Type", "application/json")
+                    .build()
             }
-            val httpBuilder: Builder = HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
-            val sn = SystemUtil.getLtpSn()
-            httpBuilder.addQueryParameter("sn", sn)
-            httpBuilder.addQueryParameter("ts", ts)
 
-            val mediaType: MediaType = parse.parse("application/json; charset=utf-8")
-            list.add(hashMap)
-            val body: RequestBody = RequestBody.create(Gson().toJson(hashMap), mediaType)
+            val okHttpClient = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                OkHttpClient.Builder()
+                    .connectTimeout(Duration.ofMinutes(10))
+                    .readTimeout(Duration.ofMinutes(10))
+                    .callTimeout(Duration.ofMinutes(10))
+                    .build()
+            } else {
+                OkHttpClient()
+            }
 
-            val request: Request = Builder().url(httpBuilder.build()).addHeader(AUTHORIZATION, auth)
-                .method("POST", body).addHeader("Content-Type", "application/json").build()
-            client!!.newCall(request).enqueue(callback!!)
+            okHttpClient.newCall(request!!).enqueue(callback!!)
         }
 
         fun post3(
@@ -517,27 +558,37 @@ class GeeUINetworkUtil private constructor(context: Context) {
             uri: String,
             callback: Callback?
         ) {
-            val list = ArrayList<Any>()
-            var client: OkHttpClient? = null
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                client = Builder().connectTimeout(Duration.ofMinutes(10L))
-                    .readTimeout(Duration.ofMinutes(10L)).callTimeout(
-                    Duration.ofMinutes(10L)
-                ).build()
+            val url = "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                .apply {
+                    queryMap.forEach { (key, value) ->
+                        addQueryParameter(key!!, value)
+                    }
+                }
+                .build()
+
+            val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()!!
+            val requestBody = Gson().toJson(hashMap).toRequestBody(mediaType)
+
+            val request = auth?.let {
+                Request.Builder()
+                    .url(url)
+                    .post(requestBody)
+                    .addHeader(AUTHORIZATION, it)
+                    .addHeader("Content-Type", "application/json")
+                    .build()
             }
-            val httpBuilder: Builder = HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
 
-            for ((key, value) in queryMap) {
-                httpBuilder.addQueryParameter(key, value)
+            val okHttpClient = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                OkHttpClient.Builder()
+                    .connectTimeout(Duration.ofMinutes(10))
+                    .readTimeout(Duration.ofMinutes(10))
+                    .callTimeout(Duration.ofMinutes(10))
+                    .build()
+            } else {
+                OkHttpClient()
             }
 
-            val mediaType: MediaType = parse.parse("application/json; charset=utf-8")
-            list.add(hashMap)
-            val body: RequestBody = RequestBody.create(Gson().toJson(hashMap), mediaType)
-
-            val request: Request = Builder().url(httpBuilder.build()).addHeader(AUTHORIZATION, auth)
-                .method("POST", body).addHeader("Content-Type", "application/json").build()
-            client!!.newCall(request).enqueue(callback!!)
+            okHttpClient.newCall(request!!).enqueue(callback!!)
         }
 
         fun post3(
@@ -548,72 +599,73 @@ class GeeUINetworkUtil private constructor(context: Context) {
             uri: String,
             callback: Callback?
         ) {
-            val list = ArrayList<Any>()
-            var client: OkHttpClient? = null
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                client = Builder().connectTimeout(Duration.ofMinutes(10L))
-                    .readTimeout(Duration.ofMinutes(10L)).callTimeout(
-                    Duration.ofMinutes(10L)
-                ).build()
-            }
-            val httpBuilder: Builder = if (isChinese) {
-                HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
+            val url = if (isChinese) {
+                "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                    .apply {
+                        queryMap.forEach { (key, value) ->
+                            addQueryParameter(key!!, value)
+                        }
+                    }
+                    .build()
             } else {
-                HttpUrl.parse("https://yourservice.com$uri")!!.newBuilder()
+                "https://yourservice.com$uri".toHttpUrlOrNull()!!.newBuilder()
+                    .apply {
+                        queryMap.forEach { (key, value) ->
+                            addQueryParameter(key!!, value)
+                        }
+                    }
+                    .build()
             }
 
-            for ((key, value) in queryMap) {
-                httpBuilder.addQueryParameter(key, value)
+            val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()!!
+            val requestBody = Gson().toJson(hashMap).toRequestBody(mediaType)
+
+            val country = if (isChinese) CN else GLOBAL
+
+            val request = auth?.let {
+                Request.Builder()
+                    .url(url)
+                    .post(requestBody)
+                    .addHeader(AUTHORIZATION, it)
+                    .addHeader(COUNTRY, country)
+                    .addHeader("Content-Type", "application/json")
+                    .build()
             }
 
-            val mediaType: MediaType = parse.parse("application/json; charset=utf-8")
-            list.add(hashMap)
-            val body: RequestBody = RequestBody.create(Gson().toJson(hashMap), mediaType)
-
-            //        File file = new File("");
-//        RequestBody body1 = new MultipartBody.Builder().setType(MultipartBody.FORM)
-//                .addFormDataPart("file", file.getName(), RequestBody.create(MediaType.parse("application/octet-stream"), file))
-//                .addPart(body).build();
-            var country = CN
-            if (!isChinese) {
-                country = GLOBAL
+            val okHttpClient = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                OkHttpClient.Builder()
+                    .connectTimeout(Duration.ofMinutes(10))
+                    .readTimeout(Duration.ofMinutes(10))
+                    .callTimeout(Duration.ofMinutes(10))
+                    .build()
+            } else {
+                OkHttpClient()
             }
 
-            val request: Request =
-                Builder().url(httpBuilder.build()).addHeader(AUTHORIZATION, auth).addHeader(
-                    COUNTRY, country
-                ).method("POST", body).addHeader("Content-Type", "application/json").build()
-            client!!.newCall(request).enqueue(callback!!)
-
-            //        Request request = new Request.Builder().url(httpBuilder.build()).addHeader(AUTHORIZATION,auth).addHeader(COUNTRY,country).post(body).addHeader("Content-Type", "application/json").build();
-//        client.newCall(request).enqueue(callback);
+            okHttpClient.newCall(request!!).enqueue(callback!!)
         }
 
 
         fun uploadFile(filePath: String?, callback: Callback?) {
             // Replace these with your actual server URL and file path
-            val serverUrl = "http://example.com/upload"
-
-            //            String filePath = "path/to/your/file.jpg";
-            val client = OkHttpClient()
+            val serverUrl = "http://example.com/upload".toHttpUrlOrNull()!!
             val file = File(filePath)
 
-            val requestBody: RequestBody = Builder()
+            val requestBody = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart(
                     "file",
                     file.name,
-                    RequestBody.create(parse.parse("application/octet-stream"), file)
+                    file.asRequestBody("application/octet-stream".toMediaTypeOrNull())
                 )
                 .build()
 
-            val request: Request = Builder()
+            val request = Request.Builder()
                 .url(serverUrl)
                 .post(requestBody)
                 .build()
 
-            val call = client.newCall(request)
-            call.enqueue(callback!!)
+            okHttpClient.newCall(request).enqueue(callback!!)
         } //
         //        public static void uploadFile(String filePath ,Callback callback) {
         //            // Replace these with your actual server URL and file path

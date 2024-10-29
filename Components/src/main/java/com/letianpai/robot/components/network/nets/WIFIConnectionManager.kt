@@ -1,6 +1,8 @@
 package com.letianpai.robot.components.network.nets
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.net.NetworkInfo.DetailedState
@@ -10,6 +12,7 @@ import android.net.wifi.WifiManager
 import android.os.Build
 import android.text.TextUtils
 import android.util.Log
+import androidx.core.app.ActivityCompat
 
 /**
  * @author liujunbin
@@ -23,11 +26,11 @@ class WIFIConnectionManager(private val mContext: Context) {
     var isSetIncorrectPassword: Boolean = false
 
     /**
-     * 尝试连接指定wifi
+     * Try to connect to the specified wifi
      *
-     * @param ssid     wifi名
-     * @param password 密码
-     * @return 是否连接成功
+     * @param ssid wifi name
+     * @param password Password
+     * @return Is the connection successful?
      */
     fun connect(ssid: String, password: String): Boolean {
         this.currentSsid = ssid
@@ -49,9 +52,8 @@ class WIFIConnectionManager(private val mContext: Context) {
     }
 
     /**
-     * 尝试连接指定wifi
-     *
-     * @return 是否连接成功
+     * Try to connect to the specified wifi
+     * @return Whether the connection is successful or not
      */
     fun connect(): Boolean {
         return if (TextUtils.isEmpty(currentSsid) || TextUtils.isEmpty(currentPassword)) {
@@ -62,9 +64,8 @@ class WIFIConnectionManager(private val mContext: Context) {
     }
 
     /**
-     * 根据wifi名与密码配置 WiFiConfiguration, 每次尝试都会先断开已有连接
-     *
-     * @param isClient 当前设备是作为客户端,还是作为服务端, 影响SSID和PWD
+     * Configure WiFiConfiguration based on wifi name and password, each attempt will first disconnect the existing connection.
+     * @param isClient Whether the current device is a client or a server, affects SSID and PWD.
      */
     private fun newWifiConfig(
         ssid: String,
@@ -111,7 +112,7 @@ class WIFIConnectionManager(private val mContext: Context) {
         }
 
     /**
-     * 是否已连接指定wifi
+     * Whether the specified wifi is connected
      */
     fun isConnected(ssid: String?): Boolean {
         val wifiInfo = wifiManager.connectionInfo ?: return false
@@ -119,7 +120,7 @@ class WIFIConnectionManager(private val mContext: Context) {
             SupplicantState.AUTHENTICATING, SupplicantState.ASSOCIATING, SupplicantState.ASSOCIATED, SupplicantState.FOUR_WAY_HANDSHAKE, SupplicantState.GROUP_HANDSHAKE, SupplicantState.COMPLETED -> {
                 Log.e(
                     "auto_connect",
-                    " wifiInfo.getSSID(): " + wifiInfo.ssid.replace("\"", "").toString()
+                    " wifiInfo.getSSID(): " + wifiInfo.ssid.replace("\"", "")
                 )
                 return wifiInfo.ssid.replace("\"", "") == ssid
             }
@@ -130,7 +131,7 @@ class WIFIConnectionManager(private val mContext: Context) {
 
     val isConnected: Boolean
         /**
-         * 是否已连接指定wifi
+         * Whether the specified wifi is connected
          */
         get() = if (TextUtils.isEmpty(currentSsid)) {
             false
@@ -139,7 +140,7 @@ class WIFIConnectionManager(private val mContext: Context) {
         }
 
     /**
-     * 打开WiFi
+     * Turn on the WiFi.
      * @return
      */
     fun openWifi(): Boolean {
@@ -151,7 +152,7 @@ class WIFIConnectionManager(private val mContext: Context) {
     }
 
     /**
-     * 关闭wifi
+     * Turn off wifi
      * @return
      */
     fun closeWifi(): Boolean {
@@ -163,7 +164,7 @@ class WIFIConnectionManager(private val mContext: Context) {
     }
 
     /**
-     * 断开连接
+     * Disconnect
      * @return
      */
     fun disconnect(): WIFIConnectionManager {
@@ -175,7 +176,7 @@ class WIFIConnectionManager(private val mContext: Context) {
     }
 
     /**
-     * 删除网络
+     * Delete Network
      * @return
      */
     fun removeNetwork(): Boolean {
@@ -186,7 +187,7 @@ class WIFIConnectionManager(private val mContext: Context) {
     }
 
     /**
-     * 是否连接过指定Wifi
+     * Whether the specified Wifi has been connected
      */
     fun everConnected(ssid: String): WifiConfiguration? {
 //        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -201,7 +202,16 @@ class WIFIConnectionManager(private val mContext: Context) {
 //        }
 
         var ssid = ssid
-        val existingConfigs = wifiManager.configuredNetworks
+        val existingConfigs = if (ActivityCompat.checkSelfPermission(
+                mContext,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.e(TAG, "Permissions not granted")
+            null
+        } else {
+            wifiManager.configuredNetworks
+        }
         if (existingConfigs == null || existingConfigs.isEmpty()) {
             return null
         }
@@ -216,7 +226,7 @@ class WIFIConnectionManager(private val mContext: Context) {
 
     val localIp: String?
         /**
-         * 获取本机的ip地址
+         * Get local ip address
          */
         get() = convertIp(wifiManager.connectionInfo.ipAddress)
 
@@ -230,7 +240,7 @@ class WIFIConnectionManager(private val mContext: Context) {
         var connectState = WIFI_STATE_NONE
 
         if (Build.VERSION.SDK_INT >= 26) {
-            //高通8.0 GO
+            //Qualcomm 8.0 GO
             val wifiInfo = wifiManager.connectionInfo
             val manager =
                 context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -262,7 +272,16 @@ class WIFIConnectionManager(private val mContext: Context) {
     }
 
     private fun findNetworkidBySsid(ssid: String): Int {
-        val wifiConfigs = wifiManager.configuredNetworks
+        val wifiConfigs = if (ActivityCompat.checkSelfPermission(
+                mContext,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.e(TAG, "Permissions not granted")
+            null
+        } else {
+            wifiManager.configuredNetworks
+        }
         var curNetworkId = -1
         if (wifiConfigs != null) {
             for (existingConfig in wifiConfigs) {
@@ -321,8 +340,8 @@ class WIFIConnectionManager(private val mContext: Context) {
                 .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             if (cm == null) {
             } else {
-                //如果仅仅是用来判断网络连接
-                //则可以使用 cm.getActiveNetworkInfo().isAvailable();
+                //If it is only used to determine network connectivity
+                //then you can use cm.getActiveNetworkInfo().isAvailable();
                 val info = cm.allNetworkInfo
                 if (info != null) {
                     for (i in info.indices) {

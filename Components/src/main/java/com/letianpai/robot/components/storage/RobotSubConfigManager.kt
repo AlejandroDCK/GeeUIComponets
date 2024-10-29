@@ -172,7 +172,7 @@ class RobotSubConfigManager private constructor(private val mContext: Context) :
         private var mRobotConfigManager: RobotSubConfigManager? = null
         fun getInstance(context: Context?): RobotSubConfigManager? {
             if (mRobotConfigManager == null) {
-                mRobotConfigManager = RobotSubConfigManager(context)
+                mRobotConfigManager = RobotSubConfigManager(context!!)
                 mRobotConfigManager!!.initKidSmartConfigState()
                 mRobotConfigManager!!.commit()
             }

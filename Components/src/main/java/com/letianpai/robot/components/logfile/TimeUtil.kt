@@ -15,13 +15,13 @@ object TimeUtil {
         val day = cd[Calendar.DAY_OF_MONTH] //获取日期
         val week = cd[Calendar.DAY_OF_WEEK] //获取星期
         val weekString = when (week) {
-            Calendar.SUNDAY -> "周日"
-            Calendar.MONDAY -> "周一"
-            Calendar.TUESDAY -> "周二"
-            Calendar.WEDNESDAY -> "周三"
-            Calendar.THURSDAY -> "周四"
-            Calendar.FRIDAY -> "周五"
-            else -> "周六"
+            Calendar.SUNDAY -> "Sunday"
+            Calendar.MONDAY -> "Monday"
+            Calendar.TUESDAY -> "Tuesday"
+            Calendar.WEDNESDAY -> "Wednesday"
+            Calendar.THURSDAY -> "Thursday"
+            Calendar.FRIDAY -> "Friday"
+            else -> "Saturday"
         }
         return weekString
     }

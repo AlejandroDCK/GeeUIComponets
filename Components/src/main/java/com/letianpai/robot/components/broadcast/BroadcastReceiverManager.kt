@@ -16,8 +16,9 @@ class BroadcastReceiverManager(var mContext: Context) {
     }
 
     private fun init() {
-        // TODO 增加需要监听的广播进行初始化
-        // TODO 此处为需要监听状态的统一入口，唯一的监听位置，后续需要状态的，统一在此处进行监听后进行分发
+        // TODO add the initialisation of the broadcasts to be listened to.
+        // TODO This is the unified entry point for the state to be listened to, the only listening position,
+        //  TODO the subsequent need for state, unified here to listen to the state after distribution
         setBatteryListener()
     }
 

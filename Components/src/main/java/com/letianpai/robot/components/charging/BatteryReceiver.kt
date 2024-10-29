@@ -20,7 +20,7 @@ class BatteryReceiver() : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         this.mContext = context
-        when (intent.getAction()) {
+        when (intent.action) {
             Intent.ACTION_BATTERY_CHANGED -> handleBatteryChanged(context, intent)
             Intent.ACTION_POWER_DISCONNECTED -> responseDisconnect()
             Intent.ACTION_POWER_CONNECTED -> responseConnect()
@@ -28,12 +28,12 @@ class BatteryReceiver() : BroadcastReceiver() {
     }
 
     private fun responseDisconnect() {
-        ChargingUpdateCallback.Companion.getInstance().setChargingStatus(false, currentPercent)
+        ChargingUpdateCallback.instance.setChargingStatus(false, currentPercent)
     }
 
     private fun responseConnect() {
 //        GeeUILogUtils.logi("letianpai","responseConnect_responseCharging"+ currentPercent);
-        ChargingUpdateCallback.Companion.getInstance().setChargingStatus(true, currentPercent)
+        ChargingUpdateCallback.instance.setChargingStatus(true, currentPercent)
     }
 
     private fun handleBatteryChanged(context: Context, intent: Intent) {
@@ -89,31 +89,31 @@ class BatteryReceiver() : BroadcastReceiver() {
     }
 
     /**
-     * 响应断冲
+     * Response discharging
      * @param context
      * @param percent
      * @param chargePlug
      */
     private fun responseDisCharging(context: Context, percent: Int, chargePlug: Int) {
-        //TODO 需要增加重复弹窗保护
+        //TODO Need to add repeat pop-up protection
         //TODO to be check and removed
 
         chargingMode = false
-        ChargingUpdateCallback.Companion.getInstance().setChargingStatus(false, percent, chargePlug)
+        ChargingUpdateCallback.instance.setChargingStatus(false, percent, chargePlug)
         hideChargingView()
     }
 
     /**
-     * 响应断冲
+     * Response discharging
      * @param context
      * @param percent
      */
     private fun responseDisCharging(context: Context, percent: Int) {
-        //TODO 需要增加重复弹窗保护
+        //TODO Need to add repeat pop-up protection
         //TODO to be check and removed
 
         chargingMode = false
-        ChargingUpdateCallback.Companion.getInstance().setChargingStatus(chargingMode, percent)
+        ChargingUpdateCallback.instance.setChargingStatus(chargingMode, percent)
         hideChargingView()
     }
 
@@ -126,28 +126,29 @@ class BatteryReceiver() : BroadcastReceiver() {
     private fun responseCharging(context: Context, percent: Int) {
         sendShowChargingDialog(context, percent)
         chargingMode = true
-        ChargingUpdateCallback.Companion.getInstance().setChargingStatus(chargingMode, percent)
+        ChargingUpdateCallback.instance.setChargingStatus(chargingMode, percent)
         showChargingView()
         killApps()
     }
 
     /**
-     * 显示充电弹窗
+     * Show charging pop-up
      * @param context
      * @param percent
      */
     private fun sendShowChargingDialog(context: Context, percent: Int) {
-        //TODO 展示通电弹窗，此处通道接口，不做UI展示，只做消息传递，展示层做此逻辑
+        //TODO Show the power-up pop-up window, here the channel interface,
+        // TODO do not do UI display, only do the message passing, display layer to do this logic
     }
 
     /**
-     * 显示低电弹窗
+     * Show Low Power Popup
      *
      * @param mContext
      */
     private fun showBatteryLowDialog(mContext: Context) {
-        //TODO 需要做低点提醒
-        // TODO 乐天派需要做分段电量提醒逻辑（20%， 10%， 5%）
+        // TODO needs to do low point alerts
+      // TODO Optimist needs to do segmented power alert logic (20%, 10%, 5%)
     }
 
     /**
@@ -158,40 +159,35 @@ class BatteryReceiver() : BroadcastReceiver() {
     private fun getScreenStatus(context: Context): Boolean {
         val powerManager: PowerManager =
             context.getSystemService(Context.POWER_SERVICE) as PowerManager
-        return powerManager.isScreenOn()
+        return powerManager.isScreenOn
     }
 
     private fun isCharging(chargePlug: Int): Boolean {
-        if ((chargePlug == BatteryManager.BATTERY_PLUGGED_AC
+        return (chargePlug == BatteryManager.BATTERY_PLUGGED_AC
                     ) || (chargePlug == BatteryManager.BATTERY_PLUGGED_USB
                     ) || (chargePlug == BatteryManager.BATTERY_PLUGGED_WIRELESS)
-        ) {
-            return true
-        } else {
-            return false
-        }
     }
 
     private fun showChargingView() {
-        //TODO 显示正在弹窗页面
-        //TODO 此处通道接口，不做UI展示，只做消息传递，展示层做此逻辑
+        //TODO display is popping page
+        //TODO here channel interface, do not do UI display, only do message passing, display layer do this logic
     }
 
     private fun hideChargingView() {
-        //TODO 此处通道接口，不做UI展示，只做消息传递，展示层做此逻辑
+        //TODO Here the channel interface, do not do UI display, only do the message passing, display layer to do this logic
     }
 
     /**
      * 倒计时关机接口
      */
     fun showCountdownDialog() {
-        //TODO 此处通道接口，不做UI展示，只做消息传递，展示层做此逻辑
+        //TODO Here the channel interface, do not do UI display, only do the message passing, display layer to do this logic
     }
 
     /**
-     * 杀死充电时，需要关闭的服务及App
+     * Services and Apps to close when killing charging
      */
     private fun killApps() {
-        //TODO 给framework层法消息，充电时，杀掉所有耗电操作
+        //TODO Send a message to the framework layer to kill all power-consuming operations when charging.
     }
 }

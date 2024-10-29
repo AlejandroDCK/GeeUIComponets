@@ -16,7 +16,7 @@ object TimeUtils {
 
     fun getCountDownDay(time: Long): String {
 //        if (LocaleUtils.isChinese()) {
-        return if (SystemUtil.isInChinese()) {
+        return if (SystemUtil.isInChinese) {
             convertTimeFormat(time, "MM月dd日")
         } else {
             convertTimeFormat(time, "yyyy/MM/dd")

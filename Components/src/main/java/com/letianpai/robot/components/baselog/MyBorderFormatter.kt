@@ -3,7 +3,7 @@ package com.letianpai.robot.components.baselog
 import com.elvishew.xlog.formatter.border.BorderFormatter
 
 
-class MyBorderFormatter() : BorderFormatter {
+class MyBorderFormatter : BorderFormatter {
     private val VERTICAL_BORDER_CHAR: String = "║"
 
     // Length: 100.

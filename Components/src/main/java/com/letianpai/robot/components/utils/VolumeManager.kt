@@ -20,7 +20,7 @@ class VolumeManager private constructor(private val mContext: Context) {
     private fun init(context: Context) {
         audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-        //TODO 屏蔽消息提醒
+        //TODO Block Message Alerts
 //        test();
     }
 

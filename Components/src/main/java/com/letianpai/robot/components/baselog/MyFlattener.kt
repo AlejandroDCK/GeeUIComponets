@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 
-class MyFlattener() : Flattener, Flattener2 {
+class MyFlattener : Flattener, Flattener2 {
     override fun flatten(logLevel: Int, tag: String, message: String): CharSequence {
         return flatten(System.currentTimeMillis(), logLevel, tag, message)
     }

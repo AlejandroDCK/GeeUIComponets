@@ -20,7 +20,7 @@ object LogToFile {
         var fileWriter: FileWriter? = null
         var fileWriter1: FileWriter? = null
         var fileWriter2: FileWriter? = null
-        val battery: Int = ChargingUpdateCallback.Companion.instance.battery
+        val battery: Int = ChargingUpdateCallback.instance.battery
         try {
             fileWriter = FileWriter(logFile, true) // true表示追加写入，false表示覆盖写入
             fileWriter.append(logMessage)

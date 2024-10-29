@@ -32,9 +32,9 @@ object GeeUiNetManager {
      * @param callback
      */
     fun getDeviceInfo(context: Context?, isChinese: Boolean, callback: Callback?) {
-        val ts: String = EncryptionUtils.Companion.getTs()
-        val auth: String = EncryptionUtils.Companion.getHardCodeSign(ts)
-        GeeUINetworkUtil.Companion.get11(
+        val ts: String = EncryptionUtils.ts
+        val auth: String = EncryptionUtils.getHardCodeSign(ts)
+        GeeUINetworkUtil.get11(
             context,
             isChinese,
             auth,
@@ -474,8 +474,8 @@ object GeeUiNetManager {
      */
     fun getLatestPackage(context: Context?, appId: Int, callback: Callback?) {
         val hashMap = HashMap<String?, String?>()
-        val sn = SystemUtil.getLtpSn()
-        val ts: String = EncryptionUtils.Companion.getTs()
+        val sn = SystemUtil.ltpSn
+        val ts: String = EncryptionUtils.ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_SN] = sn
         hashMap[GeeUINetConsts.HASH_MAP_KEY_TS] = ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_APP_ID] = appId.toString() + ""
@@ -490,8 +490,8 @@ object GeeUiNetManager {
      */
     fun getAppList(context: Context?, isChinese: Boolean, callback: Callback?) {
         val hashMap = HashMap<String?, String?>()
-        val sn = SystemUtil.getLtpSn()
-        val ts: String = EncryptionUtils.Companion.getTs()
+        val sn = SystemUtil.ltpSn
+        val ts: String = EncryptionUtils.ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_SN] = sn
         hashMap[GeeUINetConsts.HASH_MAP_KEY_TS] = ts
         get1(context, isChinese, hashMap, GeeUINetworkConsts.GET_APP_LIST, callback)
@@ -505,8 +505,8 @@ object GeeUiNetManager {
      */
     fun getLatestPackage(context: Context?, isChinese: Boolean, appId: Int, callback: Callback?) {
         val hashMap = HashMap<String?, String?>()
-        val sn = SystemUtil.getLtpSn()
-        val ts: String = EncryptionUtils.Companion.getTs()
+        val sn = SystemUtil.ltpSn
+        val ts: String = EncryptionUtils.ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_SN] = sn
         hashMap[GeeUINetConsts.HASH_MAP_KEY_TS] = ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_APP_ID] = appId.toString() + ""
@@ -521,8 +521,8 @@ object GeeUiNetManager {
      */
     fun getBindCode(context: Context?, isChinese: Boolean, callback: Callback?) {
         val hashMap = HashMap<String?, String?>()
-        val sn = SystemUtil.getLtpSn()
-        val ts: String = EncryptionUtils.Companion.getTs()
+        val sn = SystemUtil.ltpSn
+        val ts: String = EncryptionUtils.ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_SN] = sn
         hashMap[GeeUINetConsts.HASH_MAP_KEY_TS] = ts
         get1(context, isChinese, hashMap, GeeUINetworkConsts.GET_BIND_CODE, callback)
@@ -537,7 +537,7 @@ object GeeUiNetManager {
     fun moduleChange(context: Context?, modeName: String, callback: Callback?) {
         val modules = arrayOf(modeName)
         //TODO 增加获取
-        val hashMap: HashMap<*, *> = HashMap<Any?, Any?>()
+        val hashMap: HashMap<String, Any> = HashMap()
         hashMap["selected_module_tag_list"] = modules
         post(context, GeeUINetworkConsts.POST_MODULE_CHANGE, hashMap, callback)
     }
@@ -551,9 +551,9 @@ object GeeUiNetManager {
     fun updateAppStatus(context: Context?, appInfo: AppInfo, sn: String?, callback: Callback?) {
         val appInfos = arrayOf(appInfo)
         //TODO 增加获取
-        val hashMap: HashMap<*, *> = HashMap<Any?, Any?>()
+        val hashMap: HashMap<String, Any> = HashMap()
         hashMap["appInfo"] = appInfos
-        hashMap["sn"] = sn
+        hashMap["sn"] = sn as Any
         post(context, GeeUINetworkConsts.POST_UPLOAD_APP_STATUS, hashMap, callback)
     }
 
@@ -572,9 +572,9 @@ object GeeUiNetManager {
     ) {
         val appInfos = arrayOf(appInfo)
         //TODO 增加获取
-        val hashMap: HashMap<*, *> = HashMap<Any?, Any?>()
+        val hashMap: HashMap<String, Any> = HashMap()
         hashMap["appInfo"] = appInfos
-        hashMap["sn"] = sn
+        hashMap["sn"] = sn!!
         post(context, isChinese, GeeUINetworkConsts.POST_UPLOAD_APP_STATUS, hashMap, callback)
     }
 
@@ -593,10 +593,10 @@ object GeeUiNetManager {
         callback: Callback?
     ) {
         //TODO 增加获取
-        val hashMap: HashMap<*, *> = HashMap<Any?, Any?>()
+        val hashMap: HashMap<String, Any> = HashMap()
         hashMap["app_id"] = appId
-        hashMap["app_name"] = appName
-        hashMap["app_package_name"] = appPackageName
+        hashMap["app_name"] = appName!!
+        hashMap["app_package_name"] = appPackageName!!
         //        hashMap.put("sn", sn);
         post(context, isChinese, GeeUINetworkConsts.POST_UPLOAD_USER_APP_STATUS, hashMap, callback)
     }
@@ -619,9 +619,9 @@ object GeeUiNetManager {
         }
 
         //TODO 增加获取
-        val hashMap: HashMap<*, *> = HashMap<Any?, Any?>()
+        val hashMap: HashMap<String, Any> = HashMap()
         hashMap["appInfo"] = appInfos
-        hashMap["sn"] = sn
+        hashMap["sn"] = sn!!
         post(context, GeeUINetworkConsts.POST_UPLOAD_APP_STATUS, hashMap, callback)
     }
 
@@ -644,9 +644,9 @@ object GeeUiNetManager {
         }
 
         //TODO 增加获取
-        val hashMap: HashMap<*, *> = HashMap<Any?, Any?>()
+        val hashMap: HashMap<String, Any> = HashMap()
         hashMap["appInfo"] = appInfos
-        hashMap["sn"] = sn
+        hashMap["sn"] = sn!!
         post(context, isChinese, GeeUINetworkConsts.POST_UPLOAD_APP_STATUS, hashMap, callback)
     }
 
@@ -656,7 +656,7 @@ object GeeUiNetManager {
      * @param callback
      */
     fun robotReset(context: Context?, callback: Callback?) {
-        val hashMap: HashMap<*, *> = HashMap<Any?, Any?>()
+        val hashMap: HashMap<String, Any> = HashMap()
         hashMap["reset_status"] = 0
         post(context, GeeUINetworkConsts.POST_RESET_STATUS, hashMap, callback)
     }
@@ -667,7 +667,7 @@ object GeeUiNetManager {
      * @param context
      * @param callback
      */
-    fun uploadStatus(context: Context?, hashMap: HashMap<*, *>?, callback: Callback?) {
+    fun uploadStatus(context: Context?, hashMap: HashMap<String, Any>?, callback: Callback?) {
         post(context, GeeUINetworkConsts.UPLOAD_STATUS, hashMap, callback)
     }
 
@@ -680,7 +680,7 @@ object GeeUiNetManager {
     fun uploadStatus(
         context: Context?,
         isChinese: Boolean,
-        hashMap: HashMap<*, *>?,
+        hashMap: HashMap<String, Any>?,
         callback: Callback?
     ) {
         post(context, isChinese, GeeUINetworkConsts.UPLOAD_STATUS, hashMap, callback)
@@ -695,7 +695,7 @@ object GeeUiNetManager {
     fun bindRobot(
         context: Context?,
         isChinese: Boolean,
-        hashMap: HashMap<*, *>?,
+        hashMap: HashMap<String, Any>?,
         callback: Callback?
     ) {
         post(context, isChinese, GeeUINetworkConsts.POST_MANAGE_ADD, hashMap, callback)
@@ -710,19 +710,19 @@ object GeeUiNetManager {
     fun uploadBatteryStatus(
         context: Context?,
         isChinese: Boolean,
-        hashMap: HashMap<*, *>?,
+        hashMap: HashMap<String, Any>?,
         callback: Callback?
     ) {
         post(context, isChinese, GeeUINetworkConsts.UPLOAD_BATTERY_STATUS, hashMap, callback)
     }
 
     private fun uploadBatteryStatus(context: Context, chargingStatus: Int, callback: Callback) {
-        val hashMap: HashMap<*, *> = HashMap<Any?, Any?>()
-        val sn = SystemUtil.getLtpSn()
+        val hashMap: HashMap<String, Any> = HashMap()
+        val sn = SystemUtil.ltpSn
         hashMap["sn"] = sn
         hashMap["automatic_battery"] = chargingStatus
 
-        uploadBatteryStatus(context, SystemUtil.isInChinese(), hashMap, callback)
+        uploadBatteryStatus(context, SystemUtil.isInChinese, hashMap, callback)
     }
 
     fun uploadExitAutoCharging(context: Context, callback: Callback) {
@@ -741,11 +741,11 @@ object GeeUiNetManager {
      * @param callback
      */
     fun uploadLexLog(context: Context?, isChinese: Boolean, data: String?, callback: Callback?) {
-        val sn = SystemUtil.getLtpSn()
+        val sn = SystemUtil.ltpSn
         //TODO 增加获取
-        val hashMap: HashMap<*, *> = HashMap<Any?, Any?>()
+        val hashMap: HashMap<String, Any> = HashMap()
         hashMap["sn"] = sn
-        hashMap["data"] = data
+        hashMap["data"] = data!!
         post(context, isChinese, GeeUINetworkConsts.UPLOAD_LEX_LOG, hashMap, callback)
     }
 
@@ -757,7 +757,7 @@ object GeeUiNetManager {
     //    public static void getTipsList(Context context, Callback callback){
     //
     //        HashMap<String,String> hashMap = new HashMap<>();
-    //        String sn = SystemUtil.getLtpSn();
+    //        String sn = SystemUtil.ltpSn;
     //        hashMap.put(GeeUINetConsts.HASH_MAP_KEY_SN,sn);
     //        hashMap.put(GeeUINetConsts.HASH_MAP_KEY_SN,sn);
     //        hashMap.put(GeeUINetConsts.HASH_MAP_KEY_CONFIG,GeeUINetConsts.HASH_MAP_CONFIG_KEY_VALUE);
@@ -772,8 +772,8 @@ object GeeUiNetManager {
      */
     fun getTipsList(context: Context?, isChinese: Boolean, callback: Callback?) {
         val hashMap = HashMap<String?, String?>()
-        val sn = SystemUtil.getLtpSn()
-        val ts: String = EncryptionUtils.Companion.getTs()
+        val sn = SystemUtil.ltpSn
+        val ts: String = EncryptionUtils.ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_SN] = sn
         hashMap[GeeUINetConsts.HASH_MAP_KEY_TS] = ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_CONFIG] = GeeUINetConsts.HASH_MAP_CONFIG_KEY_VALUE
@@ -790,8 +790,8 @@ object GeeUiNetManager {
      */
     fun getCommonList(context: Context?, isChinese: Boolean, key: String?, callback: Callback?) {
         val hashMap = HashMap<String?, String?>()
-        val sn = SystemUtil.getLtpSn()
-        val ts: String = EncryptionUtils.Companion.getTs()
+        val sn = SystemUtil.ltpSn
+        val ts: String = EncryptionUtils.ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_SN] = sn
         hashMap[GeeUINetConsts.HASH_MAP_KEY_TS] = ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_CONFIG] = key
@@ -848,8 +848,8 @@ object GeeUiNetManager {
      */
     fun getAppTipsList(context: Context?, callback: Callback?) {
         val hashMap = HashMap<String?, String?>()
-        val sn = SystemUtil.getLtpSn()
-        val ts: String = EncryptionUtils.Companion.getTs()
+        val sn = SystemUtil.ltpSn
+        val ts: String = EncryptionUtils.ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_SN] = sn
         hashMap[GeeUINetConsts.HASH_MAP_KEY_TS] = ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_CONFIG] = GeeUINetConsts.HASH_MAP_CONFIG_APP_TIPS_VALUE
@@ -858,8 +858,8 @@ object GeeUiNetManager {
 
     fun getMenuConfig(context: Context?, isChinese: Boolean, callback: Callback?) {
         val hashMap = HashMap<String?, String?>()
-        val sn = SystemUtil.getLtpSn()
-        val ts: String = EncryptionUtils.Companion.getTs()
+        val sn = SystemUtil.ltpSn
+        val ts: String = EncryptionUtils.ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_SN] = sn
         hashMap[GeeUINetConsts.HASH_MAP_KEY_TS] = ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_CONFIG] = GeeUINetConsts.HASH_MAP_CONFIG_ROBOT_MENU_LIST
@@ -873,8 +873,8 @@ object GeeUiNetManager {
      */
     fun getAppTipsList(context: Context, appTitleTipUpdateListener: AppTitleTipUpdateListener?) {
         val hashMap = HashMap<String?, String?>()
-        val sn = SystemUtil.getLtpSn()
-        val ts: String = EncryptionUtils.Companion.getTs()
+        val sn = SystemUtil.ltpSn
+        val ts: String = EncryptionUtils.ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_SN] = sn
         hashMap[GeeUINetConsts.HASH_MAP_KEY_TS] = ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_CONFIG] = GeeUINetConsts.HASH_MAP_CONFIG_APP_TIPS_VALUE
@@ -885,10 +885,10 @@ object GeeUiNetManager {
 
             @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {
-                if (response?.body() != null) {
+                if (response.body != null) {
                     var info = ""
-                    if (response?.body() != null) {
-                        info = response.body()!!.string()
+                    if (response?.body != null) {
+                        info = response.body!!.string()
                     }
 
                     //                    Log.e("letianpai_tips", "getAppTipsList ======== info: " + info);
@@ -898,19 +898,19 @@ object GeeUiNetManager {
                     try {
                         if (info != null) {
                             appTips = Gson().fromJson(info, AppTips::class.java)
-                            if (appTips != null && appTips.data != null && appTips.data.config_data != null && appTips.data.config_data.size > 0) {
-                                AppTitleTipCallback.Companion.getInstance()
+                            if (appTips != null && appTips.data!!.config_data.isNotEmpty()) {
+                                AppTitleTipCallback.instance
                                     .registerTimerKeeperUpdateListener(appTitleTipUpdateListener)
-                                for (i in appTips.data.config_data.indices) {
-                                    if (appTips.data.config_data[i] != null && appTips.data.config_data[i].packageName != null && appTips.data.config_data[i].packageName == context.packageName) {
-                                        AppTitleTipCallback.Companion.getInstance().setAppTitleTip(
-                                            appTips.data.config_data[i].tip_content,
-                                            appTips.data.config_data[i].tip_content_en,
-                                            appTips.data.config_data[i].tip_icon
+                                for (i in appTips.data!!.config_data.indices) {
+                                    if (appTips.data!!.config_data[i].packageName != null && appTips.data!!.config_data[i].packageName == context.packageName) {
+                                        AppTitleTipCallback.instance.setAppTitleTip(
+                                            appTips.data!!.config_data[i].tip_content,
+                                            appTips.data!!.config_data[i].tip_content_en,
+                                            appTips.data!!.config_data[i].tip_icon
                                         )
                                     }
                                 }
-                                AppTitleTipCallback.Companion.getInstance()
+                                AppTitleTipCallback.instance
                                     .unregisterTimerKeeperUpdateListener(appTitleTipUpdateListener)
                             }
                         }
@@ -932,8 +932,8 @@ object GeeUiNetManager {
         appTitleTipUpdateListener: AppTitleTipUpdateListener?
     ) {
         val hashMap = HashMap<String?, String?>()
-        val sn = SystemUtil.getLtpSn()
-        val ts: String = EncryptionUtils.Companion.getTs()
+        val sn = SystemUtil.ltpSn
+        val ts: String = EncryptionUtils.ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_SN] = sn
         hashMap[GeeUINetConsts.HASH_MAP_KEY_TS] = ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_CONFIG] = GeeUINetConsts.HASH_MAP_CONFIG_APP_TIPS_VALUE
@@ -944,10 +944,10 @@ object GeeUiNetManager {
 
             @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {
-                if (response?.body() != null) {
+                if (response?.body != null) {
                     var info = ""
-                    if (response?.body() != null) {
-                        info = response.body()!!.string()
+                    if (response?.body != null) {
+                        info = response.body!!.string()
                     }
 
                     //                    Log.e("letianpai_tips", "getAppTipsList ======== info: " + info);
@@ -957,19 +957,19 @@ object GeeUiNetManager {
                     try {
                         if (info != null) {
                             appTips = Gson().fromJson(info, AppTips::class.java)
-                            if (appTips != null && appTips.data != null && appTips.data.config_data != null && appTips.data.config_data.size > 0) {
-                                AppTitleTipCallback.Companion.getInstance()
+                            if (appTips != null && appTips.data!! != null && appTips.data!!.config_data != null && appTips.data!!.config_data.size > 0) {
+                                AppTitleTipCallback.instance
                                     .registerTimerKeeperUpdateListener(appTitleTipUpdateListener)
-                                for (i in appTips.data.config_data.indices) {
-                                    if (appTips.data.config_data[i] != null && appTips.data.config_data[i].packageName != null && appTips.data.config_data[i].packageName == context.packageName) {
-                                        AppTitleTipCallback.Companion.getInstance().setAppTitleTip(
-                                            appTips.data.config_data[i].tip_content,
-                                            appTips.data.config_data[i].tip_content_en,
-                                            appTips.data.config_data[i].tip_icon
+                                for (i in appTips.data!!.config_data.indices) {
+                                    if (appTips.data!!.config_data[i] != null && appTips.data!!.config_data[i].packageName != null && appTips.data!!.config_data[i].packageName == context.packageName) {
+                                        AppTitleTipCallback.instance.setAppTitleTip(
+                                            appTips.data!!.config_data[i].tip_content,
+                                            appTips.data!!.config_data[i].tip_content_en,
+                                            appTips.data!!.config_data[i].tip_icon
                                         )
                                     }
                                 }
-                                AppTitleTipCallback.Companion.getInstance()
+                                AppTitleTipCallback.instance
                                     .unregisterTimerKeeperUpdateListener(appTitleTipUpdateListener)
                             }
                         }
@@ -991,8 +991,8 @@ object GeeUiNetManager {
         appUploadConfigUpdateListener: AppUploadConfigUpdateListener?
     ) {
         val hashMap = HashMap<String?, String?>()
-        val sn = SystemUtil.getLtpSn()
-        val ts: String = EncryptionUtils.Companion.getTs()
+        val sn = SystemUtil.ltpSn
+        val ts: String = EncryptionUtils.ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_SN] = sn
         hashMap[GeeUINetConsts.HASH_MAP_KEY_TS] = ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_CONFIG] =
@@ -1004,10 +1004,10 @@ object GeeUiNetManager {
 
             @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {
-                if (response?.body() != null) {
+                if (response?.body != null) {
                     var info = ""
-                    if (response?.body() != null) {
-                        info = response.body()!!.string()
+                    if (response?.body != null) {
+                        info = response.body!!.string()
                     }
 
 
@@ -1015,20 +1015,20 @@ object GeeUiNetManager {
                     if (info != null) {
                         try {
                             uploadDataConfig = Gson().fromJson(info, UploadDataConfig::class.java)
-                            if (uploadDataConfig != null && uploadDataConfig.data != null && uploadDataConfig.data.config_data != null && uploadDataConfig.data.config_data.size > 0) {
-                                AppUploadConfigCallback.Companion.getInstance()
+                            if (uploadDataConfig != null && uploadDataConfig.data!!.config_data.isNotEmpty()) {
+                                AppUploadConfigCallback.instance
                                     .registerAppUploadConfigUpdateListener(
                                         appUploadConfigUpdateListener
                                     )
-                                for (i in uploadDataConfig.data.config_data.indices) {
-                                    if (uploadDataConfig.data.config_data[i] != null && uploadDataConfig.data.config_data[i].packageName != null && uploadDataConfig.data.config_data[i].packageName == context.packageName) {
-                                        AppUploadConfigCallback.Companion.getInstance()
+                                for (i in uploadDataConfig.data!!.config_data.indices) {
+                                    if (uploadDataConfig.data!!.config_data[i].packageName != null && uploadDataConfig.data!!.config_data[i].packageName == context.packageName) {
+                                        AppUploadConfigCallback.instance
                                             .setAppUploadConfig(
-                                                uploadDataConfig.data.config_data[i].upload_frequency
+                                                uploadDataConfig.data!!.config_data[i].upload_frequency
                                             )
                                     }
                                 }
-                                AppUploadConfigCallback.Companion.getInstance()
+                                AppUploadConfigCallback.instance
                                     .unregisterAppUploadConfigUpdateListener(
                                         appUploadConfigUpdateListener
                                     )
@@ -1053,8 +1053,8 @@ object GeeUiNetManager {
         appQRCodeInfoUpdateListener: (String, Boolean) -> Int
     ) {
         val hashMap = HashMap<String?, String?>()
-        val sn = SystemUtil.getLtpSn()
-        val ts: String = EncryptionUtils.Companion.getTs()
+        val sn = SystemUtil.ltpSn
+        val ts: String = EncryptionUtils.ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_SN] = sn
         hashMap[GeeUINetConsts.HASH_MAP_KEY_TS] = ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_CONFIG] =
@@ -1064,12 +1064,13 @@ object GeeUiNetManager {
             override fun onFailure(call: Call, e: IOException) {
             }
 
+
             @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {
-                if (response?.body() != null) {
+                if (response.body != null) {
                     var info = ""
-                    if (response?.body() != null) {
-                        info = response.body()!!.string()
+                    if (response?.body != null) {
+                        info = response.body!!.string()
                     }
 
                     //                    GeeUILogUtils.logi("letianpai_qrcode", "getAppQrcodeInfo ======== info: " + info);
@@ -1078,17 +1079,25 @@ object GeeUiNetManager {
                     try {
                         if (info != null) {
                             qrCodeTips = Gson().fromJson(info, QRCodeTips::class.java)
-                            if (qrCodeTips != null && qrCodeTips.data != null && qrCodeTips.data.config_data != null && qrCodeTips.data.config_data.size > 0) {
-                                AppQRCodeInfoCallback.Companion.getInstance()
-                                    .registerAppQRCodeInfoUpdateListener(appQRCodeInfoUpdateListener)
+                            if (qrCodeTips?.data != null && qrCodeTips.data!!.config_data.isNotEmpty()) {
+                                val updateListener = object : AppQRCodeInfoCallback.AppQRCodeInfoUpdateListener {
+                                    override fun onAppQRCodeInfoUpdateReceived(
+                                        qrcodeString: String,
+                                        isShowQrcode: Boolean
+                                    ) {
+                                        appQRCodeInfoUpdateListener(qrcodeString, isShowQrcode)
+                                    }
+                                }
+                                AppQRCodeInfoCallback.instance.registerAppQRCodeInfoUpdateListener(updateListener)
+
                                 //                                GeeUILogUtils.logi("letianpai_qrcode", "qrCodeTips.getData().getConfig_data().length: " + qrCodeTips.getData().getConfig_data().length);
-                                for (i in qrCodeTips.data.config_data.indices) {
+                                for (i in qrCodeTips.data!!.config_data.indices) {
 //                                    GeeUILogUtils.logi("letianpai_qrcode", "getAppQrcodeInfo =========2: ");
-                                    if (qrCodeTips.data.config_data[i] != null && qrCodeTips.data.config_data[i].package_name != null && qrCodeTips.data.config_data[i].package_name == context.packageName) {
+                                    if (qrCodeTips.data!!.config_data[i].package_name != null && qrCodeTips.data!!.config_data[i].package_name == context.packageName) {
 //                                        GeeUILogUtils.logi("letianpai_qrcode", "getAppQrcodeInfo =========3: ");
-                                        AppQRCodeInfoCallback.Companion.getInstance().setQrCodeInfo(
-                                            qrCodeTips.data.config_data[i].toString(),
-                                            qrCodeTips.data.config_data[i].isShow_qrcode
+                                        AppQRCodeInfoCallback.instance.setQrCodeInfo(
+                                            qrCodeTips.data!!.config_data[i].toString(),
+                                            qrCodeTips.data!!.config_data[i].isShow_qrcode
                                         )
                                     }
                                 }
@@ -1109,16 +1118,16 @@ object GeeUiNetManager {
      * @param callback
      */
     fun get1(context: Context?, uri: String?, callback: Callback?) {
-        val ts: String = EncryptionUtils.Companion.getTs()
+        val ts: String = EncryptionUtils.ts
         var sn: String? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             sn = Build.getSerial()
         }
-        val hardCode = SystemUtil.getHardCode()
+        val hardCode = SystemUtil.hardCode
         //        String hardCode = "YMcQMMZc49ZM0M";
-        val auth: String = EncryptionUtils.Companion.getRobotSign(sn, hardCode, ts)
+        val auth: String = EncryptionUtils.getRobotSign(sn!!, hardCode!!, ts)
 
-        GeeUINetworkUtil.Companion.get11(context, auth, sn, ts, uri, callback)
+        GeeUINetworkUtil.get11(context, auth, sn, ts, uri!!, callback)
     }
 
     /**
@@ -1127,16 +1136,16 @@ object GeeUiNetManager {
      * @param callback
      */
     fun get(context: Context?, uri: String?, callback: Callback?) {
-        val ts: String = EncryptionUtils.Companion.getTs()
+        val ts: String = EncryptionUtils.ts
         var sn: String? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             sn = Build.getSerial()
         }
 
-        val hardCode = SystemUtil.getHardCode()
-        val auth: String = EncryptionUtils.Companion.getRobotSign(sn, hardCode, ts)
+        val hardCode = SystemUtil.hardCode
+        val auth: String = EncryptionUtils.getRobotSign(sn!!, hardCode!!, ts)
 
-        GeeUINetworkUtil.Companion.get11(context, auth, sn, ts, uri, callback)
+        GeeUINetworkUtil.get11(context, auth, sn, ts, uri!!, callback)
     }
 
     /**
@@ -1145,16 +1154,16 @@ object GeeUiNetManager {
      * @param callback
      */
     fun get(context: Context?, isChinese: Boolean, uri: String?, callback: Callback?) {
-        val ts: String = EncryptionUtils.Companion.getTs()
+        val ts: String = EncryptionUtils.ts
         var sn: String? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             sn = Build.getSerial()
         }
 
-        val hardCode = SystemUtil.getHardCode()
-        val auth: String = EncryptionUtils.Companion.getRobotSign(sn, hardCode, ts)
+        val hardCode = SystemUtil.hardCode
+        val auth: String = EncryptionUtils.getRobotSign(sn!!, hardCode!!, ts)
 
-        GeeUINetworkUtil.Companion.get(context, isChinese, auth, sn, ts, uri, callback)
+        GeeUINetworkUtil.get(context!!, isChinese, auth, sn, ts, uri!!, callback)
     }
 
     /**
@@ -1169,22 +1178,22 @@ object GeeUiNetManager {
         pageSize: Int,
         callback: Callback?
     ) {
-        val ts: String = EncryptionUtils.Companion.getTs()
+        val ts: String = EncryptionUtils.ts
         var sn: String? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             sn = Build.getSerial()
         }
 
-        val hardCode = SystemUtil.getHardCode()
-        val auth: String = EncryptionUtils.Companion.getRobotSign(sn, hardCode, ts)
+        val hardCode = SystemUtil.hardCode
+        val auth: String = EncryptionUtils.getRobotSign(sn!!, hardCode!!, ts)
 
-        GeeUINetworkUtil.Companion.getWithPage(
+        GeeUINetworkUtil.getWithPage(
             context,
             isChinese,
             auth,
             sn,
             ts,
-            uri,
+            uri!!,
             pageSize,
             callback
         )
@@ -1196,17 +1205,17 @@ object GeeUiNetManager {
      * @param callback
      */
     fun getWithModelPath(context: Context?, isChinese: Boolean, uri: String?, callback: Callback?) {
-        val ts: String = EncryptionUtils.Companion.getTs()
+        val ts: String = EncryptionUtils.ts
         var sn: String? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             sn = Build.getSerial()
         }
 
-        val hardCode = SystemUtil.getHardCode()
-        val auth: String = EncryptionUtils.Companion.getRobotSign(sn, hardCode, ts)
+        val hardCode = SystemUtil.hardCode
+        val auth: String = EncryptionUtils.getRobotSign(sn!!, hardCode!!, ts)
         val modelPath = "tmp"
 
-        GeeUINetworkUtil.Companion.get(context, isChinese, auth, sn, ts, modelPath, uri, callback)
+        GeeUINetworkUtil.get(context, isChinese, auth, sn, ts, modelPath, uri!!, callback)
     }
 
 
@@ -1220,16 +1229,16 @@ object GeeUiNetManager {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             sn = Build.getSerial()
         }
-        val hardCode = SystemUtil.getHardCode()
+        val hardCode = SystemUtil.hardCode
         //        String hardCode = "YMcQMMZc49ZM0M";
-        val auth: String = EncryptionUtils.Companion.getRobotSign(sn, hardCode, ts)
+        val auth: String = EncryptionUtils.getRobotSign(sn!!, hardCode!!, ts)
 
         val hashMap: MutableMap<String?, String?> = HashMap()
         hashMap[GeeUINetConsts.HASH_MAP_KEY_TS] = ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_SN] = sn
         hashMap[GeeUINetConsts.HASH_MAP_KEY_CONFIG] = GeeUINetConsts.HASH_MAP_CONFIG_KEY_VALUE
 
-        GeeUINetworkUtil.Companion.get11(context, auth, hashMap, uri, callback)
+        GeeUINetworkUtil.get11(context, auth, hashMap, uri!!, callback)
     }
 
     /**
@@ -1248,16 +1257,16 @@ object GeeUiNetManager {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             sn = Build.getSerial()
         }
-        val hardCode = SystemUtil.getHardCode()
+        val hardCode = SystemUtil.hardCode
         //        String hardCode = "YMcQMMZc49ZM0M";
-        val auth: String = EncryptionUtils.Companion.getRobotSign(sn, hardCode, ts)
+        val auth: String = EncryptionUtils.getRobotSign(sn!!, hardCode!!, ts)
 
         val hashMap: MutableMap<String?, String?> = HashMap()
         hashMap[GeeUINetConsts.HASH_MAP_KEY_TS] = ts
         hashMap[GeeUINetConsts.HASH_MAP_KEY_SN] = sn
         hashMap[GeeUINetConsts.HASH_MAP_KEY_CONFIG] = GeeUINetConsts.HASH_MAP_CONFIG_KEY_VALUE
 
-        GeeUINetworkUtil.Companion.get11(context, isChinese, auth, hashMap, uri, callback)
+        GeeUINetworkUtil.get11(context, isChinese, auth, hashMap, uri!!, callback)
     }
 
     /**
@@ -1271,10 +1280,10 @@ object GeeUiNetManager {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             sn = Build.getSerial()
         }
-        val hardCode = SystemUtil.getHardCode()
-        val auth: String = EncryptionUtils.Companion.getRobotSign(sn, hardCode, ts)
+        val hardCode = SystemUtil.hardCode
+        val auth: String = EncryptionUtils.getRobotSign(sn!!, hardCode!!, ts)
 
-        GeeUINetworkUtil.Companion.get11(context, auth, hashMap, uri, callback)
+        GeeUINetworkUtil.get11(context, auth, hashMap, uri!!, callback)
     }
 
     /**
@@ -1295,10 +1304,10 @@ object GeeUiNetManager {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             sn = Build.getSerial()
         }
-        val hardCode = SystemUtil.getHardCode()
-        val auth: String = EncryptionUtils.Companion.getRobotSign(sn, hardCode, ts)
+        val hardCode = SystemUtil.hardCode
+        val auth: String = EncryptionUtils.getRobotSign(sn!!, hardCode!!, ts)
 
-        GeeUINetworkUtil.Companion.get11(context, isChinese, auth, hashMap, uri, callback)
+        GeeUINetworkUtil.get11(context, isChinese, auth, hashMap, uri!!, callback)
     }
 
     /**
@@ -1306,15 +1315,15 @@ object GeeUiNetManager {
      *
      * @param callback
      */
-    fun post1(context: Context?, uri: String?, bodyMap: HashMap<*, *>?, callback: Callback?) {
-        val ts: String = EncryptionUtils.Companion.getTs()
+    fun post1(context: Context?, uri: String?, bodyMap: HashMap<String, Any>?, callback: Callback?) {
+        val ts: String = EncryptionUtils.ts
         var sn: String? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             sn = Build.getSerial()
         }
-        val hardCode = SystemUtil.getHardCode()
+        val hardCode = SystemUtil.hardCode
         //        String hardCode = "YMcQMMZc49ZM0M";
-        val auth: String = EncryptionUtils.Companion.getRobotSign(sn, hardCode, ts)
+        val auth: String = EncryptionUtils.getRobotSign(sn!!, hardCode!!, ts)
 
         //        GeeUILogUtils.logi("letianpai_encode", "ts_1: " + ts);
 //        GeeUILogUtils.logi("letianpai_encode", "sn_1: " + sn);
@@ -1324,7 +1333,7 @@ object GeeUiNetManager {
         queryMap[GeeUINetConsts.HASH_MAP_KEY_TS] = ts
         queryMap[GeeUINetConsts.HASH_MAP_KEY_SN] = sn
 
-        GeeUINetworkUtil.Companion.post3(bodyMap, auth, queryMap, uri, callback)
+        GeeUINetworkUtil.post3(bodyMap!!, auth, queryMap, uri!!, callback)
     }
 
     /**
@@ -1332,20 +1341,20 @@ object GeeUiNetManager {
      *
      * @param callback
      */
-    fun post(context: Context?, uri: String?, bodyMap: HashMap<*, *>?, callback: Callback?) {
-        val ts: String = EncryptionUtils.Companion.getTs()
+    fun post(context: Context?, uri: String?, bodyMap: HashMap<String, Any>?, callback: Callback?) {
+        val ts: String = EncryptionUtils.ts
         var sn: String? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             sn = Build.getSerial()
         }
-        val hardCode = SystemUtil.getHardCode()
-        val auth: String = EncryptionUtils.Companion.getRobotSign(sn, hardCode, ts)
+        val hardCode = SystemUtil.hardCode
+        val auth: String = EncryptionUtils.getRobotSign(sn!!, hardCode!!, ts)
 
         val queryMap: MutableMap<String?, String?> = HashMap()
         queryMap[GeeUINetConsts.HASH_MAP_KEY_TS] = ts
         queryMap[GeeUINetConsts.HASH_MAP_KEY_SN] = sn
 
-        GeeUINetworkUtil.Companion.post3(bodyMap, auth, queryMap, uri, callback)
+        GeeUINetworkUtil.post3(bodyMap!!, auth, queryMap, uri!!, callback)
     }
 
     /**
@@ -1357,22 +1366,22 @@ object GeeUiNetManager {
         context: Context?,
         isChinese: Boolean,
         uri: String?,
-        bodyMap: HashMap<*, *>?,
+        bodyMap: HashMap<String, Any>?,
         callback: Callback?
     ) {
-        val ts: String = EncryptionUtils.Companion.getTs()
+        val ts: String = EncryptionUtils.ts
         var sn: String? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             sn = Build.getSerial()
         }
-        val hardCode = SystemUtil.getHardCode()
-        val auth: String = EncryptionUtils.Companion.getRobotSign(sn, hardCode, ts)
+        val hardCode = SystemUtil.hardCode
+        val auth: String = EncryptionUtils.getRobotSign(sn!!, hardCode!!, ts)
 
         val queryMap: MutableMap<String?, String?> = HashMap()
         queryMap[GeeUINetConsts.HASH_MAP_KEY_TS] = ts
         queryMap[GeeUINetConsts.HASH_MAP_KEY_SN] = sn
 
-        GeeUINetworkUtil.Companion.post3(bodyMap, isChinese, auth, queryMap, uri, callback)
+        GeeUINetworkUtil.post3(bodyMap!!, isChinese, auth, queryMap, uri!!, callback)
     }
 
 
@@ -1400,14 +1409,14 @@ object GeeUiNetManager {
     //     * @param callback
     //     */
     //    public static void getStock(Context context, Callback callback){
-    //        String ts = EncryptionUtils.getTs();
+    //        String ts = EncryptionUtils.ts;
     //        String sn = null;
     //        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
     //            sn = Build.getSerial();
     //        }
-    //        String hardCode = SystemUtil.getHardCode();
+    //        String hardCode = SystemUtil.hardCode;
     ////        String hardCode = "YMcQMMZc49ZM0M";
-    //        String auth = EncryptionUtils.getRobotSign(sn,hardCode,ts);
+    //        String auth = EncryptionUtils.getRobotSign(sn,hardCode!!,ts);
     //
     //        Log.e("letianpai_encode","ts_1: "+ts);
     //        Log.e("letianpai_encode","sn_1: "+sn);
@@ -1421,14 +1430,14 @@ object GeeUiNetManager {
     //     * @param callback
     //     */
     //    public static void getCustomList(Context context, Callback callback){
-    //        String ts = EncryptionUtils.getTs();
+    //        String ts = EncryptionUtils.ts;
     //        String sn = null;
     //        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
     //            sn = Build.getSerial();
     //        }
-    //        String hardCode = SystemUtil.getHardCode();
+    //        String hardCode = SystemUtil.hardCode;
     ////        String hardCode = "YMcQMMZc49ZM0M";
-    //        String auth = EncryptionUtils.getRobotSign(sn,hardCode,ts);
+    //        String auth = EncryptionUtils.getRobotSign(sn,hardCode!!,ts);
     //
     //        Log.e("letianpai_encode","ts_1: "+ts);
     //        Log.e("letianpai_encode","sn_1: "+sn);

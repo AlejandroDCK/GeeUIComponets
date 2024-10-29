@@ -6,10 +6,10 @@ import java.io.IOException
 
 object AssetsUtils {
     /**
-     * @param assetsPath 如果读取assets根目录下的东西 传入""即可
-     * 如果需要读取assets下某个文件夹下的所有文件列表，传文件夹名称 即可
-     * 有多级文件夹，传入各级文件夹名称，使用"/"分隔即可
-     * @return 所有文件名
+     * @param assetsPath If you want to read something in the assets root directory, pass in ‘’.
+     * If you need to read the list of all files in a folder under assets, pass in the name of the folder.
+     * If you have multiple levels of folders, pass in the names of each level, separated by ‘/’.
+     * @return All file names
      * @title: getAllAssetsList
      * @return: String[]
      */

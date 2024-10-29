@@ -43,7 +43,7 @@ class LogToFileUtil private constructor(private val mContext: Context) {
         logFile = File(mContext.applicationContext.filesDir, LOG_FILE_NAME)
         Log.d(TAG, "logFile.getAbsoluteFile(): " + logFile!!.absoluteFile)
         try {
-            fileWriter = FileWriter(logFile, true) // true表示追加写入，false表示覆盖写入
+            fileWriter = FileWriter(logFile, true) // true means append write, false means overwrite write.
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -78,11 +78,11 @@ class LogToFileUtil private constructor(private val mContext: Context) {
     fun writeLogToFile() {
         val logFile2 = File("/storage/emulated/0/Android/", LOG_FILE_NAME)
         val log =
-            TimeUtil.correctFullTime + "__" + ChargingUpdateCallback.Companion.instance
+            TimeUtil.correctFullTime + "__" + ChargingUpdateCallback.instance
                 .battery + "%"
         var fileWriter: FileWriter? = null
         try {
-            fileWriter = FileWriter(logFile2, true) // true表示追加写入，false表示覆盖写入
+            fileWriter = FileWriter(logFile2, true) //  true means append write, false means overwrite write.
             fileWriter.append(log)
             fileWriter.append("\n")
             fileWriter.flush()

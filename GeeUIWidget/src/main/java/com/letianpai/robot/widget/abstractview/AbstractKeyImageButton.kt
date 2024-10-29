@@ -25,7 +25,9 @@ abstract class AbstractKeyImageButton : RelativeLayout {
     protected var pressedImage: Int = 0
     @JvmField
     protected var unPressedImage: Int = 0
-    protected var isEnable: Boolean = true
+    @JvmField
+    protected var isEnabled: Boolean = true
+
 
     constructor(context: Context) : super(context) {
         init(context)
@@ -66,7 +68,7 @@ abstract class AbstractKeyImageButton : RelativeLayout {
         rlButtonRoot = findViewById(R.id.rl_button_root)
         buttonImage = findViewById(R.id.button_image)
         keyImageButton!!.setOnTouchListener(OnTouchListener { v, event ->
-            if (!isEnable) {
+            if (!isEnabled) {
                 return@OnTouchListener false
             }
             if (event.action == MotionEvent.ACTION_UP) {
@@ -81,7 +83,7 @@ abstract class AbstractKeyImageButton : RelativeLayout {
     }
 
     override fun setOnClickListener(l: OnClickListener?) {
-        if (isEnable) {
+        if (isEnabled) {
             super.setOnClickListener(l)
         }
     }
@@ -167,6 +169,6 @@ abstract class AbstractKeyImageButton : RelativeLayout {
 
 
     fun setEnable(enable: Boolean) {
-        isEnable = enable
+        isEnabled = enable
     }
 }

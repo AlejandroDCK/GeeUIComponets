@@ -39,12 +39,12 @@ class ExpressionCenter private constructor(context: Context) {
                 cursor.close()
             }
             if (!TextUtils.isEmpty(filePath)) {
-                ExpressionPathCallback.Companion.getInstance().updateExpressionPath(filePath)
+                ExpressionPathCallback.instance.updateExpressionPath(filePath)
             } else if (TextUtils.isEmpty(filePath) && !TextUtils.isEmpty(defaultPath)) {
-                ExpressionPathCallback.Companion.getInstance().updateExpressionPath(defaultPath)
+                ExpressionPathCallback.instance.updateExpressionPath(defaultPath)
             } else {
                 //切换下一个表情
-                ExpressionPathCallback.Companion.getInstance().expressionFileNoExit(name)
+                ExpressionPathCallback.instance.expressionFileNoExit(name)
             }
         }).start()
     }

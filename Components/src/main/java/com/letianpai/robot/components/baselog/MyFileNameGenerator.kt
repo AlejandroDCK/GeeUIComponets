@@ -6,7 +6,7 @@ import com.elvishew.xlog.printer.file.naming.FileNameGenerator
 import java.text.SimpleDateFormat
 import java.util.Date
 
-class MyFileNameGenerator() : FileNameGenerator {
+class MyFileNameGenerator : FileNameGenerator {
     override fun isFileNameChangeable(): Boolean {
         return true
     }

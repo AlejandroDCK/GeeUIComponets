@@ -74,7 +74,7 @@ object QRCodeUtil {
     @Throws(WriterException::class)
     fun createQRCodWithLogo(context: Context?, content: String?, size: Int): Bitmap? {
         val qrBitmap = createQRCode(content, size)
-        val logoBitmap = getLogoBitmap(context, R.drawable.logo)
+        val logoBitmap = getLogoBitmap(context!!, R.drawable.logo)
         val mergedBitmap = addLogo(qrBitmap, logoBitmap)
         return mergedBitmap
     }

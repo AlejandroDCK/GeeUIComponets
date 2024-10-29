@@ -66,16 +66,16 @@ class ImageBgView : RelativeLayout {
     private val imageUrl: Unit
         get() {
             Thread {
-                GeeUiNetManager.getAppBgInfo(mContext, SystemUtil.isInChinese(), object : Callback {
+                GeeUiNetManager.getAppBgInfo(mContext, SystemUtil.isInChinese, object : Callback {
                     override fun onFailure(call: Call, e: IOException) {
                     }
 
                     @Throws(IOException::class)
                     override fun onResponse(call: Call, response: Response) {
-                        if (response?.body() != null) {
+                        if (response?.body != null) {
                             var info = ""
-                            if (response?.body() != null) {
-                                info = response.body()!!.string()
+                            if (response?.body != null) {
+                                info = response.body!!.string()
                             }
                             try {
                                 val imageBgInfo: ImageBgInfo?
@@ -86,10 +86,10 @@ class ImageBgView : RelativeLayout {
                                     )
                                     imageBgInfo = Gson().fromJson(info, ImageBgInfo::class.java)
                                     if (imageBgInfo != null && imageBgInfo.data != null && (!TextUtils.isEmpty(
-                                            imageBgInfo.data.bg_url
+                                            imageBgInfo.data!!.bg_url
                                         ))
                                     ) {
-                                        updateBackground(imageBgInfo.data.bg_url)
+                                        updateBackground(imageBgInfo.data!!.bg_url)
                                     }
                                 }
                             } catch (e: Exception) {

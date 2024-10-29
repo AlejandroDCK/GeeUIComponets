@@ -66,16 +66,16 @@ class ImageBgsView : RelativeLayout {
     private val imageUrl: Unit
         get() {
             Thread {
-                GeeUiNetManager.getAppBgInfo(mContext, SystemUtil.isInChinese(), object : Callback {
+                GeeUiNetManager.getAppBgInfo(mContext, SystemUtil.isInChinese, object : Callback {
                     override fun onFailure(call: Call, e: IOException) {
                     }
 
                     @Throws(IOException::class)
                     override fun onResponse(call: Call, response: Response) {
-                        if (response?.body() != null) {
+                        if (response.body != null) {
                             var info = ""
-                            if (response?.body() != null) {
-                                info = response.body()!!.string()
+                            if (response?.body != null) {
+                                info = response.body!!.string()
                             }
                             val imageBgInfo: ImageBgInfo?
                             try {
@@ -85,11 +85,11 @@ class ImageBgsView : RelativeLayout {
                                         "commandDistribute:command ========= 6 ======== info: $info"
                                     )
                                     imageBgInfo = Gson().fromJson(info, ImageBgInfo::class.java)
-                                    if (imageBgInfo != null && imageBgInfo.data != null && (!TextUtils.isEmpty(
-                                            imageBgInfo.data.bg_url
+                                    if (imageBgInfo?.data != null && (!TextUtils.isEmpty(
+                                            imageBgInfo.data!!.bg_url
                                         ))
                                     ) {
-                                        uploadBackground(imageBgInfo.data.bg_url)
+                                        uploadBackground(imageBgInfo.data!!.bg_url)
                                     }
                                 }
                             } catch (e: Exception) {
