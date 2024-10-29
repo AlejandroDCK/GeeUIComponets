@@ -28,7 +28,19 @@ android {
     kotlinOptions {
         jvmTarget = '11'
     }
+    buildFeatures {
+        buildFeatures.aidl = true
+        buildConfig = true
+        aidl = true
+        viewBinding = true
+    }
+    sourceSets {
+        main {
+            aidl.srcDirs = ['src/main/aidl']
+        }
+    }
 }
+
 
 dependencies {
 
