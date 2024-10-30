@@ -109,46 +109,29 @@ object SystemUtil {
         }
 
 
-    val ltpSn: String
-        get() = Build.getSerial()
+    val ltpSn: String = Build.getSerial()
 
-    val ltpLastSn: String?
-        get() {
-            val sn = ltpSn
-            return if (TextUtils.isEmpty(sn)) {
-                null
-            } else {
-                sn.substring(sn.length - 4)
-            }
-        }
+    val ltpLastSn: String? = if (TextUtils.isEmpty(ltpSn)) { null }
+            else { ltpSn.substring(ltpSn.length - 4) }
 
-    var hardCode: String?
-        get() = get(HARD_CODE, "")
+    var hardCode: String? = get(HARD_CODE, "")
         set(hardCode) {
             set(HARD_CODE, hardCode)
         }
 
     fun hasHardCode(): Boolean {
-        if (TextUtils.isEmpty(hardCode)) {
-            return false
-        }
-        return true
+        return !TextUtils.isEmpty(hardCode)
     }
 
-    var deviceSign: String?
-        get() = get(DEVICE_SIGN, "")
+    var deviceSign: String? = get(DEVICE_SIGN, "")
         set(deviceSign) {
             set(DEVICE_SIGN, deviceSign)
         }
 
-    val mcu: String?
-        get() = get(MCU_VERSION, "")
+    val mcu: String = get(MCU_VERSION, "")
 
     fun hadDeviceSign(): Boolean {
-        if (TextUtils.isEmpty(deviceSign)) {
-            return false
-        }
-        return true
+        return !TextUtils.isEmpty(deviceSign)
     }
 
 
@@ -229,15 +212,9 @@ object SystemUtil {
             //        return false;
         }
 
-    val language: String?
-        get() = get(REGION_LANGUAGE, REGION_LANGUAGE_ZH)
+    val language: String? = get(REGION_LANGUAGE, REGION_LANGUAGE_ZH)
 
-    val isChineseLanguage: Boolean
-        get() = if (language == REGION_LANGUAGE_ZH) {
-            true
-        } else {
-            false
-        }
+    val isChineseLanguage: Boolean = language == REGION_LANGUAGE_ZH
 
 
     /**

@@ -63,12 +63,7 @@ class VolumeManager private constructor(private val mContext: Context) {
 //        LogUtils.logi(vTag, "currentNotification: " + currentNotification);
     }
 
-    val currentVolume: Int
-        get() {
-            val currentAccessibility =
-                audioManager!!.getStreamVolume(AudioManager.STREAM_ACCESSIBILITY)
-            return currentAccessibility
-        }
+    val currentVolume: Int = audioManager!!.getStreamVolume(AudioManager.STREAM_ACCESSIBILITY)
 
     fun setRobotVolume(volume: Int) {
         var volume = volume

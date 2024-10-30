@@ -32,7 +32,6 @@ class AppUploadConfigCallback private constructor() {
     }
 
     companion object {
-        val instance: AppUploadConfigCallback
-            get() = AppUploadConfigCallbackHolder.instance
+        val instance: AppUploadConfigCallback = AppUploadConfigCallbackHolder.instance
     }
 }

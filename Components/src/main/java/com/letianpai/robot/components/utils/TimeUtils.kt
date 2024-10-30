@@ -7,8 +7,7 @@ import java.util.Date
 import java.util.Locale
 
 object TimeUtils {
-    val fullTime: String
-        get() = convertTimeFormat("yyyy年MM月dd日   E")
+    val fullTime: String = convertTimeFormat("yyyy年MM月dd日   E")
 
     fun getDay(time: Long): String {
         return convertTimeFormat(time, "MM月dd日")
@@ -23,8 +22,7 @@ object TimeUtils {
         }
     }
 
-    val clockTime: String
-        get() = convertTimeFormat("HH:mm")
+    val clockTime: String = convertTimeFormat("HH:mm")
 
     fun get12HourTime(): String {
         return convertTimeFormat("hh")
@@ -34,8 +32,7 @@ object TimeUtils {
         return convertTimeFormat("HH")
     }
 
-    val minTime: String
-        get() = convertTimeFormat("mm")
+    val minTime: String  = convertTimeFormat("mm")
 
     fun get24HourTime(time: Long): Int {
         return convertTimeFormatInt(time, "HH")

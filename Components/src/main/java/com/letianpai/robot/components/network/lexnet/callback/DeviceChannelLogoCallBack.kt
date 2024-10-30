@@ -30,7 +30,6 @@ class DeviceChannelLogoCallBack private constructor() {
     }
 
     companion object {
-        val instance: DeviceChannelLogoCallBack
-            get() = DeviceChannelLogoCallBackHolder.instance
+        val instance: DeviceChannelLogoCallBack = DeviceChannelLogoCallBackHolder.instance
     }
 }
