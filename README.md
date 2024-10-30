@@ -12,7 +12,7 @@
 - **Notificaciones y Alertas**: Componentes de notificación para comunicar estados importantes, advertencias o errores de manera visual y en tiempo real.
 - **Compatibilidad con Gráficos en Tiempo Real**: Soporte para gráficos en tiempo real, ideales para mostrar datos como mediciones de sensores, estadísticas y cambios de estado en tiempo real.
 - **Formulario de Configuración Rápida**: Componentes de formularios fáciles de configurar para recopilar datos de usuarios o ajustar configuraciones del sistema de manera sencilla.
--  
+  
 ## Instalación
 
 1. Clona el repositorio:
