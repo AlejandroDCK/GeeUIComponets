@@ -1,19 +1,33 @@
 # GeeUIComponents
 
-**GeeUIComponents** es una librería de componentes de interfaz de usuario (UI) para facilitar la creación de interfaces web modernas y responsivas, diseñada especialmente para entornos de IoT y dispositivos de baja potencia como ESP8266 y ESP32. Los componentes son ligeros, modulares y fácilmente integrables, permitiendo una experiencia visualmente atractiva y funcional en entornos web limitados.
+**GeeUIComponents** es una librería de componentes de para facilitar la creación de otras funcionalidades del robot
 
 ## Características
 
-- **Componentes Ligeros y Eficientes**: Componentes optimizados para dispositivos de baja potencia, que consumen poco recurso y mantienen una rápida velocidad de respuesta.
-- **Interfaz Modular y :Reutilizable**: Estructura modular que facilita la reutilización de componentes en diferentes proyectos, ahorrando tiempo de desarrollo.
-- **Compatibilidad con :ESP8266 y ESP32**: Los componentes están diseñados para funcionar sin problemas en dispositivos de baja potencia, como ESP8266 y ESP32, mejorando la experiencia de usuario en IoT.
-- **Diseño Responsivo**:: Componentes adaptables que funcionan bien en dispositivos de diferentes tamaños de pantalla, desde móviles hasta pantallas de computadora.
-- **Soporte para Temas :Personalizables**: Personalización de temas de color y estilo, permitiendo adaptar la apariencia a diferentes aplicaciones o preferencias de usuario.
-- **Componentes de Entr:ada y Control**: Incluye botones, deslizadores, interruptores y otros controles de entrada fáciles de integrar, simplificando la interacción del usuario con la interfaz.
-- **Notificaciones y Al:ertas**: Componentes de notificación para comunicar estados importantes, advertencias o errores de manera visual y en tiempo real.
-- **Compatibilidad con :Gráficos en Tiempo Real**: Soporte para gráficos en tiempo real, ideales para mostrar datos como mediciones de sensores, estadísticas y cambios de estado en tiempo real.
-- **Formulario de Confi:guración Rápida**: Componentes de formularios fáciles de configurar para recopilar datos de usuarios o ajustar configuraciones del sistema de manera sencilla.
-- **Documentación y Eje:mplos Listos para Usar**: Ejemplos de uso y documentación completa de cada componente, facilitando la implementación y personalización en diferentes proyectos.
+### CommChannel
+
+**Funcionalidad**: Archivos que definen la estructura y el comportamiento de los comandos que se pueden utilizar para interactuar con un robot
+
+### Components
+
+**App Info**: Diseñado para interactuar con las aplicaciones instaladas en el robot, facilitando la gestion y permisos.
+**Base Log**: Clases que estan diseñadas para formatear y leer de forma cómoda los logs.
+**Broadcast**: Clase diseñada para recibir eventos de broadcast en la aplicacion del robot, centrada principalmente en los eventos de la batería
+**Charging**: Clases que trabajan para gestionar el estado de la batería, por una perte el receiver para escuchar los cambios y el callback para notificar a los componentes los cambios.
+**Expression**: Claseas que trabajan para manejar la recuperación y notificación de paths de los archivos de las expresiones (face)
+**Locale/Logfile**: Utilidad para el robot como comprobar si esta en chino y utilidad para los logs
+**Network**: Funciones de encriptación (MD5 y Sha256) para la signatura del dispositivo y del robot
+***Lexnet***: Funciones para manejar la obtención y actualización de tokens de sesión
+***Nets***: Clases con funciones para la conexion wifi, para el cambio de estados de la bateria del robot
+***System***: Funciones de utilidad para todos los repositorios del robot
+**Nodata**: Clase para la gestion de las Views sin información, ya sea para incluir mensajes o redirigir al usuario mediante codigos QR
+**Storage**: Clases para la gestion del guardado de información en la sharedpreferences
+**Utils**: Utilidad general, como TimeUtils, QRCodeUtils, AssetsUtils y demás...
+**View**: Vistas custom como por ejemplo RoundImageView, ImageBGView, etc... para customizar al maximo las vistas
+
+### GeeUIWidget
+
+**Funcionalidad**: Archivos diseñados para definir botones especificos, usados por el robot
 
 ## Instalación
 
