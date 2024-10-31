@@ -9,8 +9,8 @@ import java.lang.Exception
  * @author liujunbin
  */
 class RobotSubSharedPreference(context: Context?, fileName: String?, action: String?) {
-    private var mContext: Context? = null
-    private var mFileName: String? = null
+    private var mContext: Context? = context
+    private var mFileName: String? = fileName
 
     /**
      * 使用的系统SharedPreferences对象
@@ -277,9 +277,19 @@ class RobotSubSharedPreference(context: Context?, fileName: String?, action: Str
      * @param defValue 默认值
      * @return String
      */
-    fun getString(key: String, defValue: String?): String {
+    /*
+     fun getString(key: String, defValue: String?): String {
         val v = mMap!![key] as String?
         return v ?: defValue!!
+    }
+     */
+    fun getString(key: String, defValue: String?): String? {
+        // Check if mContext and mSharedPref are not null before accessing them
+        return if (mContext != null && mSharedPref != null) {
+            mSharedPref!!.getString(key, defValue)
+        } else {
+            defValue // Return default value if either is null
+        }
     }
 
     companion object {

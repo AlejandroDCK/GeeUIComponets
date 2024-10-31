@@ -10,15 +10,15 @@ import java.util.HashSet
  * 机器人 偏好设置管理器
  * @author liujunbin
  */
-class RobotSubConfigManager private constructor(private val mContext: Context) :
-    RobotSubConfigConst {
+class RobotSubConfigManager private constructor(
+    private val mContext: Context
+) : RobotSubConfigConst {
     private val mRobotSharedPreference = RobotSubSharedPreference(
         mContext,
-        RobotSubSharedPreference.Companion.SHARE_PREFERENCE_NAME,
-        RobotSubSharedPreference.Companion.ACTION_INTENT_CONFIG_CHANGE
+        RobotSubSharedPreference.SHARE_PREFERENCE_NAME,
+        RobotSubSharedPreference.ACTION_INTENT_CONFIG_CHANGE
     )
     private val gson = Gson()
-
 
     private fun initKidSmartConfigState() {
     }
@@ -128,12 +128,17 @@ class RobotSubConfigManager private constructor(private val mContext: Context) :
         get() {
             val json = mRobotSharedPreference.getString(
                 RobotSubConfigConst.KEY_SAVE_PACKAGE_LIST,
-                null
+                null // or provide a default JSON string
             )
-            val gson = Gson()
-            val type = object : TypeToken<ArrayList<String?>?>() {}.type
-            return gson.fromJson(json, type)
+            return if (json != null) {
+                val gson = Gson()
+                val type = object : TypeToken<ArrayList<String?>?>() {}.type
+                gson.fromJson(json, type)
+            } else {
+                mutableListOf() // Return an empty list if json is null
+            }
         }
+
     val userPackageListSize: Int = userPackageList.size?: 0
 
     fun resetUserPackageList() {
