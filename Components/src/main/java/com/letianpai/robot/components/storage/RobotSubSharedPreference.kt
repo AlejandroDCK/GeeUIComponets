@@ -61,7 +61,7 @@ class RobotSubSharedPreference(context: Context?, fileName: String?, action: Str
 
     private fun sendSettingChangeBroadcast() {
         val intent = Intent(ACTION_INTENT_CONFIG_CHANGE)
-        mContext!!.sendBroadcast(intent)
+        mContext?.sendBroadcast(intent)
     }
 
     private fun sendMessageDelay(handleid: Int, delay: Long) {

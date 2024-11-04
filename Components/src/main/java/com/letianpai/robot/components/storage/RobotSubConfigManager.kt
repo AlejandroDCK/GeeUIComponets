@@ -3,6 +3,7 @@ package com.letianpai.robot.components.storage
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import android.content.Context
+import com.letianpai.robot.components.R
 import java.util.ArrayList
 import java.util.HashSet
 
@@ -40,6 +41,19 @@ class RobotSubConfigManager private constructor(
         )
     }
 
+    fun getUserPackageList(): MutableList<String?> {
+        val json = mRobotSharedPreference.getString(
+            RobotSubConfigConst.KEY_SAVE_PACKAGE_LIST,
+            null
+        )
+        return if (json != null) {
+            gson.fromJson(json, object : TypeToken<ArrayList<String?>?>() {}.type)
+        } else {
+            mutableListOf()
+        }
+    }
+
+
     val uploadFrequency: Long = mRobotSharedPreference.getInt(RobotSubConfigConst.KEY_UPLOAD_FREQUENCY, 1)
             .toLong()
 
@@ -58,8 +72,7 @@ class RobotSubConfigManager private constructor(
             )
         }
 
-
-
+    
     var uploadDataTime: Long = mRobotSharedPreference.getLong(
             RobotSubConfigConst.KEY_UPLOAD_DATA_TIME,
             0L
@@ -68,10 +81,14 @@ class RobotSubConfigManager private constructor(
             mRobotSharedPreference.putLong(RobotSubConfigConst.KEY_UPLOAD_DATA_TIME, time)
         }
 
-    var appList: String? = mRobotSharedPreference.getString(
-            RobotSubConfigConst.KEY_SAVE_APP_LIST,
-            RobotSubConfigConst.VALUE_DEFAULT_APP_LIST
-        )
+    fun getDefaultAppList(): String {
+        val resources = mContext.resources
+        val inputStream = resources.openRawResource(R.raw.default_app_list)
+        val reader = inputStream.bufferedReader()
+        return reader.use { it.readText() }
+    }
+
+    var appList: String? = getDefaultAppList()
         set(appList) {
             mRobotSharedPreference.putString(
                 RobotSubConfigConst.KEY_SAVE_APP_LIST,
@@ -92,7 +109,7 @@ class RobotSubConfigManager private constructor(
     var openMainViewTime: Long = mRobotSharedPreference.getLong(RobotSubConfigConst.KEY_SAVE_OPEN_TIME, 0)
         set(currentTimeMillis) {
             mRobotSharedPreference.putLong(
-                RobotSubConfigConst.Companion.KEY_SAVE_OPEN_TIME,
+                RobotSubConfigConst.KEY_SAVE_OPEN_TIME,
                 currentTimeMillis
             )
         }
@@ -101,11 +118,11 @@ class RobotSubConfigManager private constructor(
 
     fun saveUserPackageList(list: List<String?>?) {
         val json = gson.toJson(list)
-        mRobotSharedPreference.putString(RobotSubConfigConst.Companion.KEY_SAVE_PACKAGE_LIST, json)
+        mRobotSharedPreference.putString(RobotSubConfigConst.KEY_SAVE_PACKAGE_LIST, json)
     }
 
     fun addUserPackage(packageName: String?) {
-        var packageList = userPackageList
+        var packageList = mUserPackageList
         if (packageList == null) {
             packageList = ArrayList()
         }
@@ -116,7 +133,7 @@ class RobotSubConfigManager private constructor(
     }
 
     fun removeUserPackage(packageName: String?) {
-        var packageList = userPackageList
+        var packageList = mUserPackageList
         if (packageList == null) {
             packageList = ArrayList()
         }
@@ -124,26 +141,13 @@ class RobotSubConfigManager private constructor(
         saveUserPackageList(packageList)
     }
 
-    val userPackageList: MutableList<String?>
-        get() {
-            val json = mRobotSharedPreference.getString(
-                RobotSubConfigConst.KEY_SAVE_PACKAGE_LIST,
-                null // or provide a default JSON string
-            )
-            return if (json != null) {
-                val gson = Gson()
-                val type = object : TypeToken<ArrayList<String?>?>() {}.type
-                gson.fromJson(json, type)
-            } else {
-                mutableListOf() // Return an empty list if json is null
-            }
-        }
+    val mUserPackageList: MutableList<String?> = getUserPackageList()
 
-    val userPackageListSize: Int = userPackageList.size?: 0
+    val userPackageListSize: Int = mUserPackageList.size?: 0
 
     fun resetUserPackageList() {
         val userAppList = HashSet<String?>()
-        val getUserPackageList: List<String?> = userPackageList
+        val getUserPackageList: List<String?> = mUserPackageList
         if (getUserPackageList != null && getUserPackageList.size > 0) {
             for (i in getUserPackageList.indices) {
                 userAppList.add(getUserPackageList[i])
@@ -158,8 +162,8 @@ class RobotSubConfigManager private constructor(
         }
     }
 
-
-    companion object {
+/*
+companion object {
         private var mRobotConfigManager: RobotSubConfigManager? = null
         fun getInstance(context: Context?): RobotSubConfigManager? {
             if (mRobotConfigManager == null) {
@@ -170,4 +174,16 @@ class RobotSubConfigManager private constructor(
             return mRobotConfigManager
         }
     }
+ */
+companion object {
+    @Volatile
+    private var INSTANCE: RobotSubConfigManager? = null
+
+    fun getInstance(context: Context): RobotSubConfigManager {
+        return INSTANCE ?: synchronized(this) {
+            INSTANCE ?: RobotSubConfigManager(context).also { INSTANCE = it }
+        }
+    }
+}
+
 }

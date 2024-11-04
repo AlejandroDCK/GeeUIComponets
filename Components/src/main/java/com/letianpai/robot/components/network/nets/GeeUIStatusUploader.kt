@@ -144,7 +144,7 @@ class GeeUIStatusUploader private constructor(context: Context) {
 
     private fun checkUploadFrequency() {
         val uploadFrequencyInternalTime: Long =
-            RobotSubConfigManager.Companion.getInstance(mContext)!!.uploadFrequencyInternalTime
+            RobotSubConfigManager.getInstance(mContext!!).uploadFrequencyInternalTime
         val currentTime = System.currentTimeMillis()
         val isChinese = SystemUtil.isInChinese
         //        GeeUILogUtils.logi("uploadFrequency", "uploadFrequencyInternalTime: " + uploadFrequencyInternalTime);
@@ -174,7 +174,7 @@ class GeeUIStatusUploader private constructor(context: Context) {
         val listener = object : AppUploadConfigCallback.AppUploadConfigUpdateListener {
             override fun onAppUploadConfigUpdate(uploadFrequency: Int) {
                 if (uploadFrequency > 0) {
-                    val configManager = RobotSubConfigManager.getInstance(mContext)
+                    val configManager = RobotSubConfigManager.getInstance(mContext!!)
                     if (configManager != null) {
                         configManager.setUploadFrequency(uploadFrequency)
                         configManager.uploadFrequencyInternalTime = System.currentTimeMillis()
@@ -206,11 +206,11 @@ class GeeUIStatusUploader private constructor(context: Context) {
 
     private fun uploadRobotData() {
         val internalTime: Long =
-            RobotSubConfigManager.getInstance(mContext)!!.uploadFrequencyInternalTime
+            RobotSubConfigManager.getInstance(mContext!!).uploadFrequencyInternalTime
         val uploadFrequency: Long =
-            RobotSubConfigManager.getInstance(mContext)!!.uploadFrequency
+            RobotSubConfigManager.getInstance(mContext).uploadFrequency
         val uploadDataTime: Long =
-            RobotSubConfigManager.getInstance(mContext)!!.uploadDataTime
+            RobotSubConfigManager.getInstance(mContext).uploadDataTime
 
         val current = System.currentTimeMillis()
         //        GeeUILogUtils.logi("uploadFrequency", "internalTime: " + internalTime);
